@@ -14,7 +14,18 @@ export function minutes(sec) {
 export function buildUnits(video) {
   const segs = video.transcript?.segments || [];
   const duration = video.duration || (segs.length ? segs[segs.length - 1].s + 5 : 0);
-  const textIn = (a, b) => segs.filter((s) => s.s >= a && s.s < b).map((s) => s.t).join(' ');
+  // Time markers about every 20 s let the AI point to the exact moment of each point.
+  const textIn = (a, b) => {
+    let last = -Infinity;
+    return segs
+      .filter((s) => s.s >= a && s.s < b)
+      .map((s) => {
+        const mark = s.s - last >= 20 ? `[${clock(s.s)}] ` : '';
+        if (mark) last = s.s;
+        return mark + s.t;
+      })
+      .join(' ');
+  };
 
   if ((video.chapters || []).length >= 2) {
     const ch = video.chapters;
@@ -32,13 +43,14 @@ export function buildUnits(video) {
   for (let i = 0; i < segs.length; i++) {
     const s = segs[i];
     if (buf.length && s.s - start >= 60) {
-      units.push({ start, end: s.s, text: buf.join(' ') });
+      units.push({ start, end: s.s });
       start = s.s;
       buf = [];
     }
     buf.push(s.t);
   }
-  units.push({ start, end: Math.max(duration, start + 1), text: buf.join(' ') });
+  units.push({ start, end: Math.max(duration, start + 1) });
+  for (const u of units) u.text = textIn(u.start, u.end);
   return units.map((u, i) => ({ id: `u${i + 1}`, ...u, title: '', chapter: false }));
 }
 
@@ -46,8 +58,10 @@ export function unitAt(units, t) {
   return units.find((u) => t >= u.start && t < u.end) || units[units.length - 1] || null;
 }
 
+export const stripMarks = (t) => (t || '').replace(/\[\d+:\d{2}(?::\d{2})?\]\s?/g, '');
+
 export function preview(text, n = 12) {
-  const w = (text || '').split(/\s+/).filter(Boolean);
+  const w = stripMarks(text).split(/\s+/).filter(Boolean);
   return w.slice(0, n).join(' ') + (w.length > n ? '…' : '');
 }
 
@@ -71,7 +85,7 @@ export function toRanges(units, ids) {
     end: Math.round(r.end),
     units: r.units,
     title: r.titles.join(' / '),
-    snippet: r.text.trim().slice(0, 1500),
+    snippet: stripMarks(r.text).trim().slice(0, 1500),
   }));
 }
 

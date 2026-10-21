@@ -57,7 +57,7 @@ export function unitAt(units, t) {
 const SYSTEM = `You help one person (the sender) share part of a YouTube video with someone close to them (the recipient). You decide which part of the video to send and write one short line that appears on the card, labeled "AI". The sender reviews and can edit everything before anything is sent.
 
 Inputs you receive:
-- The video's transcript, split into numbered units (chapters, or about one minute each when the video has no chapters), each with start and end times in seconds.
+- The video's transcript, split into numbered units (chapters, or about one minute each when the video has no chapters), each with start and end times. Inside the text, markers like [21:40] give the time about every 20 seconds.
 - Marks: moments the sender clicked while watching, with an optional comment. A mark is an approximate point: always include the whole unit that contains it. The recipient sees each comment pop up at its moment while watching, so the comments tell you what the sender cares about; do not repeat them in your headline.
 - Selected units the sender ticked by hand. Always include them.
 - The sender's note to the recipient (may be empty). You never rewrite the note; it is shown exactly as written, separately from your line.
@@ -69,7 +69,7 @@ Your job:
 2. Choose the core: the units the sender most wants the recipient to see. Include every marked and selected unit. If the note points at something specific (for example "the part about X" or "this is so you"), find the units that match it anywhere in the video; the core can be scattered across several places. Keep the core as small as serves the intent (at most ${MAX_CORE_UNITS} units). If there are no marks, no selection and no specific note, choose the unit(s) that carry the video's main point.
 3. Write the headline (the AI line), at most 20 English words, plain and factual, no hype, no emoji:
    - pointer or info -> indicative: what this part is about ("Shows how to fold the dough without tearing it").
-   - about_recipient or a note asking about specific details -> informative: the concrete points, and also list them in points, each tied to the unit it came from.
+   - about_recipient or a note asking about specific details -> informative: the concrete points, and also list them in points, each tied to the unit it came from and with at_seconds = the time (in seconds) of the nearest marker before the place it is said.
    - discussion -> evaluative, phrased as a question to the recipient: "The author argues X — do you agree?", where X is the point the sender most wants to discuss.
    - fun -> empty headline ("") and summary_type "none": the card just shows the video and the note.
    Never state conclusions about the recipient (for example a diagnosis); describe what the video says.
@@ -105,8 +105,8 @@ const SCHEMA = {
       items: {
         type: 'object',
         additionalProperties: false,
-        properties: { text: { type: 'string' }, unit: { type: 'string' } },
-        required: ['text', 'unit'],
+        properties: { text: { type: 'string' }, unit: { type: 'string' }, at_seconds: { type: 'number' } },
+        required: ['text', 'unit', 'at_seconds'],
       },
     },
     rationale: { type: 'string' },
@@ -202,7 +202,7 @@ export function toRanges(units, ids) {
     end: Math.round(r.end),
     units: r.units,
     title: r.titles.filter(Boolean).join(' / '),
-    snippet: r.text.trim().slice(0, 1500),
+    snippet: r.text.replace(/\[\d+:\d{2}(?::\d{2})?\]\s?/g, '').trim().slice(0, 1500),
   }));
 }
 
@@ -223,7 +223,13 @@ export function finalize(input, ai) {
   const fun = intent === 'fun';
   const points = ai && !fun
     ? (ai.points || [])
-        .map((p) => ({ text: String(p.text).slice(0, 200), t: Math.round(units.find((u) => u.id === p.unit)?.start ?? -1), unit: p.unit }))
+        .map((p) => {
+          const u = units.find((x) => x.id === p.unit);
+          if (!u) return { t: -1 };
+          const at = Number(p.at_seconds);
+          const t = at >= u.start && at < u.end ? at : u.start;
+          return { text: String(p.text).slice(0, 200), t: Math.round(t), unit: p.unit };
+        })
         .filter((p) => p.t >= 0)
         .slice(0, 6)
     : [];

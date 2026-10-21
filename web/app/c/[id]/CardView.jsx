@@ -29,6 +29,8 @@ function loadYT() {
 function PartPlayer({ videoId, range, comments, sender, seekTo, title }) {
   const box = useRef(null);
   const player = useRef(null);
+  const ready = useRef(false);
+  const pending = useRef(seekTo || null);
   const [now, setNow] = useState(null);
 
   useEffect(() => {
@@ -42,6 +44,12 @@ function PartPlayer({ videoId, range, comments, sender, seekTo, title }) {
         playerVars: { start: Math.floor(range.start), end: Math.ceil(range.end), rel: 0, playsinline: 1, modestbranding: 1 },
         events: {
           onReady: () => {
+            ready.current = true;
+            if (pending.current) {
+              player.current.seekTo(pending.current.t, true);
+              player.current.playVideo();
+              pending.current = null;
+            }
             timer = setInterval(() => {
               try {
                 const t = player.current.getCurrentTime();
@@ -61,9 +69,12 @@ function PartPlayer({ videoId, range, comments, sender, seekTo, title }) {
   }, [videoId, range.start, range.end]);
 
   useEffect(() => {
-    if (seekTo && player.current?.seekTo) {
+    if (!seekTo) return;
+    if (ready.current && player.current?.seekTo) {
       player.current.seekTo(seekTo.t, true);
       player.current.playVideo();
+    } else {
+      pending.current = seekTo; // applied in onReady
     }
   }, [seekTo]);
 
