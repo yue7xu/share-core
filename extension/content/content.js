@@ -48,7 +48,12 @@
   }
 
   function openPanel(entry) {
-    chrome.runtime.sendMessage({ type: 'openPanel', entry, vid }).catch(() => {});
+    chrome.runtime
+      .sendMessage({ type: 'openPanel', entry, vid })
+      .then((r) => {
+        if (r && r.ok === false) showToast({ text: 'Click the Core Share icon in the Chrome toolbar to open the panel.' });
+      })
+      .catch(() => showToast({ text: 'Core Share was updated. Reload this page to keep using it.' }));
   }
 
   // ---------- Share button in the action bar (D1) ----------

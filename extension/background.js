@@ -7,10 +7,10 @@ chrome.runtime.onInstalled.addListener(() => {
 chrome.runtime.onMessage.addListener((msg, sender, reply) => {
   if (msg.type === 'openPanel' && sender.tab?.id != null) {
     // Must be called right away, while the click still counts as a user gesture.
-    chrome.sidePanel.open({ tabId: sender.tab.id }).catch(() => {});
+    const opening = chrome.sidePanel.open({ tabId: sender.tab.id });
     chrome.storage.session.set({ entry: { type: msg.entry, vid: msg.vid, tabId: sender.tab.id, at: Date.now() } });
-    reply({ ok: true });
-    return;
+    opening.then(() => reply({ ok: true })).catch(() => reply({ ok: false }));
+    return true;
   }
   if (msg.type === 'log') {
     logEvent(msg.event, msg.data).finally(() => reply({ ok: true }));

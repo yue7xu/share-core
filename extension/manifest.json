@@ -3,7 +3,7 @@
   "name": "Core Share (research)",
   "version": "0.1.0",
   "description": "Carnegie Mellon University research prototype: share the part of a YouTube video that matters, with your own note.",
-  "permissions": ["sidePanel", "storage"],
+  "permissions": ["sidePanel", "storage", "clipboardWrite"],
   "host_permissions": ["https://www.youtube.com/*"],
   "background": { "service_worker": "background.js", "type": "module" },
   "side_panel": { "default_path": "sidepanel/panel.html" },
