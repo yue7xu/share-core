@@ -5,6 +5,25 @@ export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 export const alt = 'A Core Share card';
 
+// Notes and titles can be in Chinese, Japanese or Korean; the default font has no CJK glyphs,
+// so load Noto Sans SC from Google Fonts for just the characters that need it.
+async function cjkFonts(text) {
+  if (!/[⺀-鿿가-힯豈-﫿＀-￯　-〿]/.test(text)) return [];
+  // Subset to every character used (Latin too), so nothing falls outside the loaded font.
+  const chars = [...new Set(text + '▶·—“”…0123456789:abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ')].join('');
+  const out = [];
+  for (const weight of [400, 700]) {
+    try {
+      const css = await (await fetch(`https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@${weight}&text=${encodeURIComponent(chars)}`)).text();
+      const url = css.match(/src: url\(([^)]+)\) format\('(opentype|truetype|woff)'\)/)?.[1];
+      if (url) out.push({ name: 'Noto Sans SC', data: await (await fetch(url)).arrayBuffer(), weight, style: 'normal' });
+    } catch {
+      // fall back to the default font
+    }
+  }
+  return out;
+}
+
 // The iMessage preview usually shows only this image, the title and the site name,
 // so both voices (AI line + sender's note) and the time cost are drawn into the image (D11).
 export default async function Image({ params }) {
@@ -17,10 +36,12 @@ export default async function Image({ params }) {
   const big = ai.headline || src.title || 'A shared video';
   const bigSize = big.length > 110 ? 40 : big.length > 70 ? 48 : 56;
   const noteShort = note.length > 140 ? note.slice(0, 137) + '…' : note;
+  const fonts = await cjkFonts(`${big} ${noteShort} ${(src.title || "").slice(0, 90)} YouTube ${src.channel || ""} ${card?.sender || ""} ${costLine(p)} Open to watch AI`);
+  const family = fonts.length ? '"Noto Sans SC", sans-serif' : 'sans-serif';
 
   return new ImageResponse(
     (
-      <div style={{ width: '100%', height: '100%', display: 'flex', background: '#f5f3ee', padding: 48, fontFamily: 'sans-serif' }}>
+      <div style={{ width: '100%', height: '100%', display: 'flex', background: '#f5f3ee', padding: 48, fontFamily: family }}>
         <div style={{ display: 'flex', flexDirection: 'column', width: '100%', background: '#ffffff', borderRadius: 28, border: '2px solid #e4e0d6', padding: 44 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
             {src.video_id && (
@@ -46,6 +67,6 @@ export default async function Image({ params }) {
         </div>
       </div>
     ),
-    { ...size }
+    { ...size, fonts: fonts.length ? fonts : undefined }
   );
 }
