@@ -1,5 +1,5 @@
 import { ImageResponse } from 'next/og';
-import { getCard, costLine } from '../../../lib/card';
+import { getCard, costLine, clock } from '../../../lib/card';
 
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
@@ -24,46 +24,54 @@ async function cjkFonts(text) {
   return out;
 }
 
-// The iMessage preview usually shows only this image, the title and the site name,
-// so both voices (AI line + sender's note) and the time cost are drawn into the image (D11).
+// In iMessage the preview is ~300pt wide (about 1/4 of this image), with og:title (the AI line) and the
+// site name shown as text underneath. So the image carries what the title can't, in large type:
+// which video, the sender's own note, and what it costs to watch (D11).
 export default async function Image({ params }) {
   const { id } = await params;
   const card = await getCard(id);
   const p = card?.payload || {};
   const src = p.source || {};
   const ai = p.ai || {};
+  const ranges = p.core?.ranges || [];
   const note = p.sender?.note || '';
-  const big = ai.headline || src.title || 'A shared video';
-  const bigSize = big.length > 110 ? 40 : big.length > 70 ? 48 : 56;
-  const noteShort = note.length > 140 ? note.slice(0, 137) + '…' : note;
-  const fonts = await cjkFonts(`${big} ${noteShort} ${(src.title || "").slice(0, 90)} YouTube ${src.channel || ""} ${card?.sender || ""} ${costLine(p)} Open to watch AI`);
+  const sender = card?.sender || '';
+  // Without a note, the AI line becomes the main text (still labeled AI).
+  const main = note || ai.headline || src.title || 'A shared video';
+  const isNote = Boolean(note);
+  const clipped = main.length > 90 ? main.slice(0, 88) + '…' : main;
+  const mainSize = clipped.length > 60 ? 50 : clipped.length > 34 ? 58 : 68;
+  const part = ranges.length ? `${clock(ranges[0].start)}${ranges.length > 1 ? ` +${ranges.length - 1}` : ''}` : '';
+  const cost = costLine(p);
+  const fonts = await cjkFonts(`${clipped} ${sender} ${cost} ${part} AI —“”`);
   const family = fonts.length ? '"Noto Sans SC", sans-serif' : 'sans-serif';
 
   return new ImageResponse(
     (
-      <div style={{ width: '100%', height: '100%', display: 'flex', background: '#f5f3ee', padding: 48, fontFamily: family }}>
-        <div style={{ display: 'flex', flexDirection: 'column', width: '100%', background: '#ffffff', borderRadius: 28, border: '2px solid #e4e0d6', padding: 44 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
+      <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', background: '#ffffff', fontFamily: family }}>
+        <div style={{ display: 'flex', flex: 1 }}>
+          <div style={{ display: 'flex', width: 470, height: 500, position: 'relative', background: '#1f1e1b' }}>
             {src.video_id && (
-              <img src={`https://i.ytimg.com/vi/${src.video_id}/mqdefault.jpg`} width={192} height={108} style={{ borderRadius: 12, objectFit: 'cover' }} />
+              <img src={`https://i.ytimg.com/vi/${src.video_id}/hqdefault.jpg`} width={470} height={500} style={{ objectFit: 'cover' }} />
             )}
-            <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
-              <div style={{ fontSize: 26, color: '#1f1e1b', lineHeight: 1.25, display: 'flex' }}>{(src.title || '').slice(0, 90)}</div>
-              <div style={{ fontSize: 22, color: '#6b6860', marginTop: 6, display: 'flex' }}>YouTube{src.channel ? ` · ${src.channel}` : ''}</div>
-            </div>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'flex-start', gap: 18, marginTop: 34, flex: 1 }}>
-            {ai.headline && (
-              <div style={{ display: 'flex', fontSize: 22, fontWeight: 700, color: '#534ab7', background: '#eeedfe', borderRadius: 8, padding: '4px 12px', marginTop: 10 }}>AI</div>
+            {part && (
+              <div style={{ position: 'absolute', left: 24, bottom: 24, display: 'flex', alignItems: 'center', gap: 10, background: 'rgba(20,20,20,0.82)', color: '#fff', borderRadius: 14, padding: '10px 18px', fontSize: 34, fontWeight: 700 }}>
+                ▶ {part}
+              </div>
             )}
-            <div style={{ display: 'flex', fontSize: bigSize, fontWeight: 700, color: '#1f1e1b', lineHeight: 1.2, flex: 1 }}>{big}</div>
           </div>
-          {noteShort && (
-            <div style={{ display: 'flex', fontSize: 30, color: '#1f1e1b', borderLeft: '6px solid #e4e0d6', paddingLeft: 20, marginTop: 18 }}>
-              “{noteShort}” — {card?.sender || ''}
+          <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', flex: 1, padding: '40px 52px' }}>
+            {!isNote && ai.headline && (
+              <div style={{ display: 'flex', alignSelf: 'flex-start', fontSize: 30, fontWeight: 700, color: '#534ab7', background: '#eeedfe', borderRadius: 10, padding: '4px 14px', marginBottom: 18 }}>AI</div>
+            )}
+            <div style={{ display: 'flex', fontSize: mainSize, fontWeight: 700, color: '#1f1e1b', lineHeight: 1.22 }}>
+              {isNote ? `“${clipped}”` : clipped}
             </div>
-          )}
-          <div style={{ display: 'flex', fontSize: 24, color: '#0f6e56', marginTop: 22 }}>▶ {costLine(p) || 'Open to watch'}</div>
+            {isNote && sender && <div style={{ display: 'flex', fontSize: 36, color: '#6b6860', marginTop: 18 }}>— {sender}</div>}
+          </div>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', height: 130, padding: '0 44px', background: '#eeedfe', color: '#3c3489', fontSize: 40, fontWeight: 700 }}>
+          {cost || 'Open to watch'}
         </div>
       </div>
     ),

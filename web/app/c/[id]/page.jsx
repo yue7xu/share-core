@@ -9,7 +9,7 @@ export async function generateMetadata({ params }) {
   const card = await getCard(id);
   if (!card) return { title: 'Card not available' };
   const p = card.payload;
-  const title = p.ai?.headline || p.source?.title || 'A shared video';
+  const title = p.ai?.headline ? `AI · ${p.ai.headline}` : p.source?.title || 'A shared video';
   const desc = [p.sender?.note ? `“${p.sender.note}” — ${card.sender}` : `From ${card.sender}`, costLine(p)].filter(Boolean).join(' · ');
   return {
     title,
