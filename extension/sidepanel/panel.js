@@ -233,11 +233,18 @@ function showCompose() {
 
   // marks
   if (S.marks.length) {
-    nodes.push(h('h3', {}, `Your marks (${S.marks.length})`));
-    nodes.push(h('ul', { class: 'list' }, S.marks.map((m) => h('li', {},
+    nodes.push(h('h3', {}, `Your marks and comments (${S.marks.length})`));
+    nodes.push(h('ul', { class: 'list' }, S.marks.map((m) => {
+      const input = h('input', { type: 'text', class: 'inline', maxlength: '200', placeholder: 'Add a comment (optional)', value: m.reaction || '' });
+      input.addEventListener('change', async () => {
+        m.reaction = input.value.trim();
+        await saveMarks(v.id, S.marks);
+        log('mark_comment', { via: 'panel', length: m.reaction.length });
+      });
+      return h('li', {},
       h('span', { class: 'pin', html: PIN }),
       h('button', { class: 'time', onclick: () => seek(m.t), title: 'Play from here' }, clock(m.t)),
-      h('div', { class: 'grow' }, m.reaction ? h('div', {}, m.reaction) : h('div', { class: 'sub' }, preview(unitAt(S.units, m.t)?.text || unitAt(S.units, m.t)?.title || '', 9))),
+      h('div', { class: 'grow' }, input, h('div', { class: 'sub' }, preview(unitAt(S.units, m.t)?.title || unitAt(S.units, m.t)?.text || '', 9))),
       h('button', {
         class: 'x', 'aria-label': 'Remove mark', title: 'Remove mark',
         onclick: async () => {
@@ -246,9 +253,9 @@ function showCompose() {
           log('mark_removed', { via: 'panel' });
           showCompose();
         },
-      }, '×')
-    ))));
-    nodes.push(h('p', { class: 'small muted', style: 'margin-top:6px' }, 'Each mark brings in the whole passage around it.'));
+      }, '×'));
+    })));
+    nodes.push(h('p', { class: 'small muted', style: 'margin-top:6px' }, `Each mark brings in the whole passage around it. Comments pop up for ${S.me?.partner || 'your partner'} at their moment while watching.`));
   }
 
   // manual parts (L1)
@@ -353,7 +360,9 @@ function showPreview() {
   const ai = S.draft.ai;
   const ranges = currentRanges();
   const part = coreDuration(ranges);
-  const cost = part && part < v.duration - 5 ? `The part: ${minutes(part)} · Whole video: ${minutes(v.duration)}` : `Whole video: ${minutes(v.duration)}`;
+  const shown = S.marks.filter((m) => m.reaction && m.show !== false).length;
+  const extra = shown ? ` · ${shown} ${shown === 1 ? 'comment' : 'comments'}` : '';
+  const cost = (part && part < v.duration - 5 ? `The part: ${minutes(part)} · Whole video: ${minutes(v.duration)}` : `Whole video: ${minutes(v.duration)}`) + extra;
 
   const body = h('div', { class: 'body' });
   if (ai.headline != null && ai.headline !== '') {
@@ -415,6 +424,26 @@ function showPreview() {
     });
     nodes.push(sel);
   }
+  // E2: timed comments the recipient will see while watching; each can be hidden.
+  const withText = S.marks.filter((m) => m.reaction);
+  if (withText.length) {
+    nodes.push(h('h3', {}, `Comments ${S.me?.partner || 'your partner'} sees while watching`));
+    nodes.push(h('ul', { class: 'list' }, withText.map((m) => {
+      const on = m.show !== false;
+      return h('li', { class: on ? null : 'off' },
+        h('button', { class: 'time', onclick: () => seek(m.t) }, clock(m.t)),
+        h('div', { class: 'grow comment' }, m.reaction),
+        h('button', {
+          class: 'toggle', 'aria-pressed': String(on), title: on ? 'Hide from your partner' : 'Show to your partner',
+          onclick: async () => {
+            m.show = !on;
+            await saveMarks(v.id, S.marks);
+            log(m.show ? 'comment_shown' : 'comment_hidden', {});
+            showPreview();
+          },
+        }, on ? 'Shown' : 'Hidden'));
+    })));
+  }
   if (ai.rationale) nodes.push(h('details', { class: 'why' }, h('summary', {}, 'Why these parts'), h('p', { style: 'margin:6px 0 0' }, ai.rationale)));
 
   const err = h('div', { class: 'err' });
@@ -430,7 +459,7 @@ function payload() {
   const ranges = currentRanges();
   return {
     source: { platform: 'youtube', video_id: v.id, url: `https://www.youtube.com/watch?v=${v.id}`, title: v.title, channel: v.channel, duration: Math.round(v.duration) },
-    sender: { note: S.note.trim(), entry: S.entry, marks: S.marks.map((m) => ({ t: m.t, reaction: m.reaction })), selected: [...S.selected] },
+    sender: { note: S.note.trim(), entry: S.entry, marks: S.marks.map((m) => ({ t: m.t, reaction: m.reaction || '', show: m.show !== false })), selected: [...S.selected] },
     ai: {
       available: ai.available, model: ai.model, intent_primary: ai.intent_primary, intent_secondary: ai.intent_secondary,
       about_recipient: ai.about_recipient, summary_type: ai.summary_type,
@@ -550,7 +579,9 @@ chrome.storage.onChanged.addListener(async (changes, area) => {
     if (S.view === 'idle' || S.view === 'compose') loadVideo();
   }
   if (area === 'local' && S.video && changes[markKey(S.video.id)] && S.view === 'compose') {
-    S.marks = changes[markKey(S.video.id)].newValue || [];
+    const next = changes[markKey(S.video.id)].newValue || [];
+    if (JSON.stringify(next) === JSON.stringify(S.marks)) return; // our own save
+    S.marks = next;
     showCompose();
   }
 });

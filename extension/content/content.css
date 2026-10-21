@@ -46,5 +46,4 @@
   font: inherit; color: #1f1e1b; background: #fff; outline: none;
 }
 .cs-toast input:focus { border-color: #7f77dd; }
-.cs-toast-actions { display: flex; justify-content: flex-end; margin-top: 8px; }
-.cs-toast-actions button { border: 0; background: #534ab7; color: #fff; border-radius: 8px; padding: 6px 10px; font: 500 13px/1 "Roboto", "Arial", sans-serif; cursor: pointer; }
+.cs-toast-hint { margin-top: 6px; font-size: 12px; line-height: 1.35; color: #6b6860; }

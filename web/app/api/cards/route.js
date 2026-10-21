@@ -25,7 +25,7 @@ function sanitize(p, senderName) {
       name: senderName,
       note: str(p.sender?.note, 1000) || '',
       entry: ['share', 'mark', 'icon'].includes(p.sender?.entry) ? p.sender.entry : 'share',
-      marks: (p.sender?.marks || []).slice(0, 30).map((m) => ({ t: Number(m.t) || 0, reaction: str(m.reaction, 300) || '' })),
+      marks: (p.sender?.marks || []).slice(0, 30).map((m) => ({ t: Number(m.t) || 0, reaction: str(m.reaction, 300) || '', show: m.show !== false })),
       selected: (p.sender?.selected || []).slice(0, 50).map((s) => str(s, 12)),
     },
     ai: {

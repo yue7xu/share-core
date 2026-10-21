@@ -58,7 +58,7 @@ const SYSTEM = `You help one person (the sender) share part of a YouTube video w
 
 Inputs you receive:
 - The video's transcript, split into numbered units (chapters, or about one minute each when the video has no chapters), each with start and end times in seconds.
-- Marks: moments the sender clicked while watching, with an optional reaction. A mark is an approximate point: always include the whole unit that contains it.
+- Marks: moments the sender clicked while watching, with an optional comment. A mark is an approximate point: always include the whole unit that contains it. The recipient sees each comment pop up at its moment while watching, so the comments tell you what the sender cares about; do not repeat them in your headline.
 - Selected units the sender ticked by hand. Always include them.
 - The sender's note to the recipient (may be empty). You never rewrite the note; it is shown exactly as written, separately from your line.
 - The recipient's relationship to the sender (for example "friend"), never their name.
@@ -127,7 +127,7 @@ function userMessage(input) {
     .map((u) => `<unit id="${u.id}" start="${fmt(u.start)}" end="${fmt(u.end)}"${u.title ? ` title="${u.title.replace(/"/g, "'")}"` : ''}>\n${u.text || '(no transcript)'}\n</unit>`)
     .join('\n');
   const markText = marks.length
-    ? marks.map((m) => `- at ${fmt(m.t)} (inside ${unitAt(units, m.t)?.id || '?'})${m.reaction ? `, reaction: "${m.reaction}"` : ''}`).join('\n')
+    ? marks.map((m) => `- at ${fmt(m.t)} (inside ${unitAt(units, m.t)?.id || '?'})${m.reaction ? `, comment: "${m.reaction}"` : ''}`).join('\n')
     : '(none)';
   return `<video title="${video.title.replace(/"/g, "'")}" channel="${video.channel.replace(/"/g, "'")}" duration="${fmt(video.duration)}"${video.hasTranscript ? '' : ' transcript="unavailable"'}>
 ${unitText}

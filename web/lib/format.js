@@ -15,6 +15,8 @@ export function clock(sec) {
 export function costLine(p) {
   const full = p.source?.duration || 0;
   const part = p.core?.duration || 0;
-  if (part && full && part < full - 5) return `The part: ${minutes(part)} · Whole video: ${minutes(full)}`;
-  return full ? `Whole video: ${minutes(full)}` : '';
+  const n = (p.sender?.marks || []).filter((m) => m.reaction && m.show !== false).length;
+  const extra = n ? ` · ${n} ${n === 1 ? 'comment' : 'comments'}` : '';
+  if (part && full && part < full - 5) return `The part: ${minutes(part)} · Whole video: ${minutes(full)}${extra}`;
+  return full ? `Whole video: ${minutes(full)}${extra}` : '';
 }

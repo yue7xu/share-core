@@ -9,6 +9,13 @@
 
   let vid = null;
   let toastTimer = null;
+  let partnerName = 'Your partner';
+  chrome.storage.local.get('me').then(({ me }) => {
+    if (me?.partner && me.partner !== 'your partner') partnerName = me.partner;
+  });
+  chrome.storage.onChanged.addListener((c, area) => {
+    if (area === 'local' && c.me?.newValue?.partner && c.me.newValue.partner !== 'your partner') partnerName = c.me.newValue.partner;
+  });
 
   // ---------- helpers ----------
   const videoId = () => (location.pathname === '/watch' ? new URLSearchParams(location.search).get('v') : null);
@@ -97,7 +104,7 @@
     }
     const v = videoEl();
     if (!v) return;
-    const mark = { id: crypto.randomUUID(), t: Math.round(v.currentTime * 10) / 10, reaction: '', created_at: Date.now() };
+    const mark = { id: crypto.randomUUID(), t: Math.round(v.currentTime * 10) / 10, reaction: '', show: true, created_at: Date.now() };
     const marks = await getMarks();
     marks.push(mark);
     marks.sort((a, b) => a.t - b.t);
@@ -205,7 +212,10 @@
       const input = document.createElement('input');
       input.type = 'text';
       input.maxLength = 200;
-      input.placeholder = 'Add a reaction (optional)';
+      input.placeholder = 'Add a comment (optional)';
+      const hint = document.createElement('div');
+      hint.className = 'cs-toast-hint';
+      hint.textContent = `${partnerName} will see it at ${clock(mark.t)}. Send everything with “Share the part”.`;
       // Keep YouTube's keyboard shortcuts from firing while typing.
       for (const t of ['keydown', 'keyup', 'keypress']) input.addEventListener(t, (e) => e.stopPropagation());
       input.addEventListener('keydown', async (e) => {
@@ -222,25 +232,13 @@
           mark.reaction = r;
           await updateMark(mark.id, { reaction: r });
           renderPins(await getMarks());
-          log('mark_reaction', { video: vid, length: r.length });
+          log('mark_comment', { video: vid, length: r.length });
         }
       };
       input.addEventListener('blur', saveReaction);
       input.addEventListener('focus', () => clearTimeout(toastTimer));
       toast.appendChild(input);
-
-      const actions = document.createElement('div');
-      actions.className = 'cs-toast-actions';
-      const make = document.createElement('button');
-      make.type = 'button';
-      make.textContent = 'Make card';
-      make.addEventListener('click', async () => {
-        await saveReaction();
-        toast.remove();
-        openPanel('mark');
-      });
-      actions.appendChild(make);
-      toast.appendChild(actions);
+      toast.appendChild(hint);
     }
     toast.addEventListener('mouseenter', () => clearTimeout(toastTimer));
     toast.addEventListener('mouseleave', () => {

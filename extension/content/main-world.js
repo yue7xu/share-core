@@ -7,6 +7,18 @@
 
   const cache = new Map();
   const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+  // YouTube pages make hundreds of requests; the default 250-entry resource buffer fills up
+  // and later caption requests are dropped. Enlarge it and also record caption requests ourselves.
+  const seenCaptions = [];
+  try {
+    performance.setResourceTimingBufferSize(10000);
+    new PerformanceObserver((list) => {
+      for (const e of list.getEntries()) if (e.name.includes('/api/timedtext')) seenCaptions.push(e.name);
+    }).observe({ type: 'resource', buffered: true });
+  } catch {
+    // older browsers: fall back to performance.getEntriesByType below
+  }
   const player = () => document.getElementById('movie_player');
   const adShowing = () => player()?.classList.contains('ad-showing');
 
@@ -53,10 +65,8 @@
   }
 
   function timedtextEntries(vid) {
-    return performance
-      .getEntriesByType('resource')
-      .map((e) => e.name)
-      .filter((n) => n.includes('/api/timedtext') && new URL(n).searchParams.get('v') === vid);
+    const fromBuffer = performance.getEntriesByType('resource').map((e) => e.name).filter((n) => n.includes('/api/timedtext'));
+    return [...new Set([...seenCaptions, ...fromBuffer])].filter((n) => new URL(n).searchParams.get('v') === vid);
   }
 
   function parseJson3(j) {
@@ -99,9 +109,15 @@
     let changed = false;
     if (!url) {
       const seen = new Set(timedtextEntries(vid));
+      // Reload the captions module so the player requests the track again,
+      // even when that track is already showing.
+      p.unloadModule('captions');
+      await sleep(300);
+      p.loadModule('captions');
+      await sleep(300);
       p.setOption('captions', 'track', { languageCode: pick.languageCode });
       changed = true;
-      for (let i = 0; i < 30 && !url; i++) {
+      for (let i = 0; i < 40 && !url; i++) {
         await sleep(250);
         url = timedtextEntries(vid).find((n) => !seen.has(n) && matches(n));
       }
