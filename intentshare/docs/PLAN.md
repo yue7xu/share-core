@@ -1,6 +1,6 @@
 # IntentShare · Backend + Claude API + Interaction Logging 开发计划
 
-> 2026-10-26 · v1（待 Monica 审阅）
+> 2026-10-26 · v2（已审阅：Q1 = pause LART；Q2 = Monica 最后自己加 key；新增 §11 CHI 2027 Interactive Demo）
 > 接着 `09-build-brief-v2-intent-first.md` 和 artifact **IntentShare Messages**。前端先完全沿用 artifact 现在的样子，这份计划只管 backend、真实接入 Claude API、user research 数据收集。
 > 标记：✅ 已决定（我按推荐定了）｜❓ 需要你在审阅时回答｜⚠️ 风险
 
@@ -15,7 +15,7 @@
 
 ---
 
-## 1. ❓ 审阅时需要你回答的 2 件事
+## 1. ✅ 审阅时回答的 2 件事（10/26 已回答：Q1 选 (a) pause LART；Q2 由 Monica 在最后自己加到 Vercel 和本地 `.env.local`）
 
 | # | 问题 | 为什么只能你决定 | 我的推荐 |
 |---|---|---|---|
@@ -234,10 +234,11 @@ Admin console 直接显示这些 view，并能导出 CSV（给 R / Python 分析
 | **P0 · Infra** | 按 Q1 restore `core-share`；repo 建 `intentshare/`（Next.js + TS）；Vercel project `intentshare` 连 repo；env：`SUPABASE_URL`、`SUPABASE_PUBLISHABLE_KEY`、`SERVER_RPC_KEY`、`ADMIN_TOKEN`、`AI_MODE`、`MODEL_*` | push 到 main 自动部署成功，`/api/health` 返回 DB ok |
 | **P1 · Schema** | `study` schema 全部表、索引、RPC、views；跑 Supabase security + performance advisors 并修掉 | advisors 无 error；SQL 测试脚本插入一组假 events，views 算出正确的时长 |
 | **P2 · App + telemetry** | 前端搬进 repo；`/api/session`、`/api/events`、`/api/messages`；telemetry client（队列、beacon、重发、去重）；mock AI | demo 模式跑完 S1：DB 里能看到完整 event 链，`v_share_funnel` 有正确的一行 |
-| **P3 · Claude** | `lib/claude.ts`、两个 prompt、structured outputs、`ai_calls` logging、超时重试、rate limit、eval harness | mock 下 17 个场景全通过；有 key 后 live smoke test + eval 报告 |
+| **P3 · Claude** | `lib/claude.ts`、两个 prompt、structured outputs、`ai_calls` logging、超时重试、rate limit、eval harness（含 §11.2 的 held-out message set） | mock 下 17 个场景全通过；有 key 后 live smoke test + eval 报告 |
 | **P4 · Study mode** | `/join`、pair、两台设备 sync、condition（含按日期 schedule）、survey、Exclude、研究期结束锁定 | 两个浏览器 context 模拟一对 participant：A 发卡 → B 收到、看到、点 chip、回复、答 m2；所有 timing view 正确 |
 | **P5 · Content adapters** | unfurl（OG）；article（fetch + Readability，按段落切 units）；Reddit（`.json`）；YouTube（尝试抓 transcript，失败 fallback 到 oEmbed 标题 + container-only）；`content_cache` | 真实 article / Reddit link 能出卡；YouTube 失败时优雅 fallback ⚠️ |
-| **P6 · Researcher console** | `/admin`（ADMIN_TOKEN）：participants/pairs 管理、实时 event 流、单个 share 的时间线回放、views 表格、CSV/JSONL 导出、withdrawal 删除 | 能从 console 建一对 participant 并导出他们的数据 |
+| **P6 · Researcher console** | `/admin`（ADMIN_TOKEN）：participants/pairs 管理、实时 event 流、单个 share 的时间线回放、views 表格、CSV/JSONL 导出、withdrawal 删除；**coding 工具**（§11.2：两位 coder 给 m1a/m2/held-out message 编 intent type、给 content 标「正确的 anchor」，自动算 Cohen's κ 和 anchor overlap） | 能从 console 建一对 participant 并导出他们的数据 |
+| **P8 · CHI demo readiness**（§11.4） | Booth mode（不记录任何参与者数据）、replay cache（会场断网也能跑）、presentation mode、receiver 手机视图 + QR、still image 导出、video 录制辅助 | 断网状态下 5 分钟内能完整演示 3 个场景 |
 | **P7 · 验证与文档** | Playwright e2e（demo + pair）；数据 QA 脚本（seq 缺口、孤立 event、时间倒流）；README、data dictionary、IRB 数据附录、pilot runbook；同步到你本地 folder 和 Project | 全部测试通过；一份 pilot 用的 checklist |
 
 每个 phase 结束：commit + push（自动部署）→ 线上验证 → 同步本地 `AI widgets/intentshare/` → 更新 `docs/BUILD-LOG.md`（每个我自己做的决定都写进去，方便你事后翻）。
@@ -269,3 +270,87 @@ Admin console 直接显示这些 view，并能导出 CSV（给 R / Python 分析
 | IRB v0.8 描述的是 extension flow | 这套 backend 同时支持 demo（不受 IRB 限制）和 study mode；study mode 上线前等 MOD |
 | 记录过细，数据量大 | 估算：每个 share ~100 条 events，整个 study < 10 万行，远低于 free plan 500MB |
 | Free plan 一周无活动会自动 pause | Field study 期间每天有流量不会触发；console 首页显示 DB 状态 |
+
+---
+
+## 11. CHI 2027 Interactive Demo：要收集的数据和开发注意事项
+
+### 11.1 官方要求（CHI 2027 Interactive Demos CfP）
+
+| 项 | 要求 | 对我们的影响 |
+|---|---|---|
+| 截止 | **2027-01-21（AoE）** 投稿；2/18 通知；3/18 camera-ready | Field study 必须在 1 月初前跑完，才有时间写进去 |
+| Proposal | ≤ 6 页单栏 ACM（不含 references），150 字以内 abstract；系统描述、解决的问题、和 CHI 的相关性、**user experience** 怎么样 | 需要真实的卡片截图、pipeline 图、技术数字、使用数据 |
+| Walkthrough video | **必交**，≤ 5 分钟（建议 ≤ 3 分钟），要展示用户怎么交互、体验多长 | 需要稳定、可重复的演示流程（presentation mode + replay） |
+| Still image | ≥ 1920×1080，加 image description | 需要导出高分辨率卡片 / 界面图 |
+| Booth 计划 | 约 2m×2m；桌子、WiFi、插座；**每位访客最多 5 分钟**；要说明 bystander 怎么看懂；需要的插座数提交时就要写 | 要有 5 分钟内能讲完的路径、不依赖会场 WiFi、旁观者能看懂的第二块屏幕 |
+| 审稿看重 | Novelty（写清楚和已有工作的区别）、**现场可行性**（要求的资源太多会被拒） | 设备尽量少：一台 laptop + 一部手机 |
+| 不匿名 | 要写全部作者 | 无影响；repo 保持可公开 |
+| Human subjects | 必须符合本校 ethics review，并给 reviewer 写一段说明 | 论文里用到的参与者数据都必须来自 IRB 批准后的 session |
+| 媒体权利 | 视频 / 图片里的可识别的人要有授权；音乐要 rights-free；所有内容都要有使用许可 | Demo 素材用 mock 内容或 CC 授权的内容，不用别人的 YouTube 画面截图 |
+| Accessibility | 按 SIGCHI accessible submission guide 和 video guide | 视频要有字幕；界面要支持键盘操作、足够的对比度 |
+| AI 使用 | 遵守 ACM 关于 LLM 的 authorship policy | 写论文时 AI 生成的文字要按 policy 标注（这和系统里用 AI 是两件事） |
+
+> CfP 没有要求必须有 user study，但 demo 只有 4 页（camera-ready 双栏），能放进去的证据很有限，所以要选**最能支撑 novelty 的几个数字**，而不是什么都报。
+
+### 11.2 要收集的数据（按优先级）
+
+**A. 不需要参与者、随时可以做的（technical evaluation）** —— 这是 demo paper 最稳的证据，P3 / P6 里实现
+
+| 数据 | 怎么收 | 论文里怎么用 |
+|---|---|---|
+| Intent classification 准确率 | 17 个场景 + **一个 held-out message set**（60–100 条真实风格的 message，覆盖 15 个 type，由你和另一位 coder 独立标注，算 Cohen's κ 作为 human agreement 的上限）；AI 结果 vs 人工标注 | 「AI 和人一致到什么程度」+ confusion matrix（哪些 type 容易混，例如 SUGGEST vs PROPOSE 的 indirect 版本） |
+| Evidence 的有效性 | Evidence quote 是否真的是 IFID（人工打分 0/1） | 支撑「依据可以帮 sender 发现 AI 误解」这个设计主张 |
+| Anchor 质量 | 对每个场景的 content，人工标「和 intent 相关的 units」；算 AI anchors 与人工标注的 precision / recall，time range 算 IoU | 「intent-conditioned extraction」是 core contribution，这是最直接的数字 |
+| Boundary snapping | Anchor 起止点是否落在句子 / 段落边界（自动检查） | 一句话即可 |
+| Latency | 每次 share 的 trigger → intent 显示、trigger → card 显示（p50 / p95）；模型本身时间 vs 用户等待时间 | 回答「会不会打扰正常聊天」，也是 booth 可行性的依据 |
+| Gap detection / fallback 比例 | 哪些 message 触发了追问或 fallback | 说明系统在低 confidence 时的行为 |
+| 成本 | 每次 share 的 token 数 | 一句话 |
+| Prompt / 模型版本 | 每条 `ai_calls` 都有 | 可复现性 |
+
+**B. Field study（IRB 批准 + MOD 之后）** —— 已经在 §6 的 logging 里，这里列出 demo paper 会用到的部分
+
+| 数据 | 来源 | 论文里怎么用 |
+|---|---|---|
+| 使用量 | `v_daily_compliance` | 「N 对、M 次 share、覆盖哪些 content type 和 intent type」 |
+| Sender 的 control 和 trust | 不改直接发的比例、改 intent 次数、regenerate 次数、dismiss（Send as plain link）比例 | 对应 L0–L4「who decides the core」 |
+| **Intent transfer fidelity** | m1a vs m2 的 type 一致率（研究者编码），AI card vs baseline | 最核心的 user-side 证据：卡片是否让 receiver 更准确地理解 sender |
+| 事后 sender 打分 | 「My partner understood what I meant」 | 同上，主观层面 |
+| Receiver 行为 | seen → 第一次点 chip、seen → 回复的时间；点了哪个 anchor | 卡片是否真的被使用 |
+| 真实卡片示例 | 参与者同意后的卡片截图（只用不含个人信息的） | Figure；**consent 里要有允许使用截图的选项** ⚠️ |
+| 定性引述 | Exit interview（录音，不在这个系统里） | 1–2 句 quote |
+
+**C. CHI booth 现场** —— **默认什么都不记录**
+
+在会场收集访客数据需要单独的 IRB 批准，而且没有必要。Booth mode 只在本地计数（演示了几次、用了哪些场景），不存任何访客输入，不上传。
+
+### 11.3 时间上的依赖（倒推）
+
+| 里程碑 | 依赖 | 最晚 |
+|---|---|---|
+| A 类 technical eval 跑完 | 有 API key + held-out set 标注完 | 12 月中 |
+| IRB 批准 | 11/3 convened review | 11 月 |
+| IRB MOD（新 flow + logging 细节 + 截图使用） | §6.5 的数据附录 | 11 月中提交 |
+| Field study（8 对 × 3 天） | MOD 批准 | 12 月 |
+| 写 proposal、录 video | Presentation mode、still image 导出 | 1 月初 |
+| 投稿 | — | **1/21** |
+
+⚠️ 如果 MOD 赶不上，demo paper 只用 A 类数据 + 作者自己演示的 walkthrough 也可以投（CfP 不要求 user study）；field study 的结果留给 UIST。
+
+### 11.4 开发时要注意的（已加进 P8 和其他 phase）
+
+| 注意事项 | 怎么做 | Phase |
+|---|---|---|
+| **数据来源分开** | 每条记录有 `data_origin`：`study` / `pilot` / `demo` / `author` / `booth` / `eval`。论文只用 `study`（和 IRB 允许的 `pilot`）；所有 view 默认按 origin 过滤 | P1 |
+| **会场 WiFi 不可靠** | Replay cache：每个 preset 场景的 live AI 结果存一份；断网或超时就回放，并在屏幕角落标「cached」（不对访客隐瞒） | P8 |
+| **5 分钟限制** | Booth mode 有 3 个预设路径（PROPOSE / DELIVER·opinion / 只发 link 的 gap question），一键 reset；每次演示从打字到 receiver 收到 < 60 秒 | P8 |
+| **Bystander 看得懂** | 第二块屏幕：receiver 视图在手机上（扫 QR 进入同一个 conversation）；可选的「layer view」显示 ContentObject → Intent → Anchors → Card（复用旧 artifact 的 playground 思路） | P8 |
+| **设备少** | 只需要 1 台 laptop + 1 部手机 + 1 个插座；receiver 视图必须适配手机宽度 | P8 |
+| **Video 可重复** | Presentation mode：隐藏 study 菜单和 event 计数、固定名字 A / B、固定时间；用 replay cache 让每次录制结果一致 | P8 |
+| **Still image** | Admin 里一键把任意卡片 / 界面导出成 1920×1080 PNG（Playwright 截图） | P8 |
+| **素材版权** | Demo 和 video 只用 mock 内容或 CC 授权内容；界面上不出现 Apple / iMessage 名字和图标（已经是这样） | 全程 |
+| **Accessibility** | 键盘可操作（composer、preview、chips）、ARIA label、颜色对比 ≥ 4.5:1、不只靠颜色区分 Searle class；video 加字幕 | P7 |
+| **可复现** | Repo 公开时附 payload spec、prompt 文件、eval 脚本和 held-out set（不含参与者数据） | P7 |
+| **Novelty 证据** | Baseline 开关从第一天就在；technical eval 也跑一个「content-only summary」baseline（不看 intent），对比 anchor 质量，直接说明 intent-conditioned 的价值 | P3 |
+| **失败案例** | `ai_calls` 里 classification 错误、fallback 的例子自动收集到 admin 的「failure gallery」，写 limitations 用 | P6 |
+| **截图授权** | Consent 加一项「允许在论文中使用不含个人信息的卡片截图」 | IRB MOD |
