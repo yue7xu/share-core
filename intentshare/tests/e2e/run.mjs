@@ -121,6 +121,12 @@ try {
   await a.hover('.thread .row.me >> nth=-1');
   await a.click('.thread .row.me >> nth=-1 >> [data-track=exclude-message]');
   await a.waitForSelector('text=Excluded from study');
+  // offline: the message is queued and delivered after reconnecting (same id, no duplicate)
+  await ca.setOffline(true);
+  await a.fill('#input', 'sent while offline'); await a.click('#send'); await wait(800);
+  await ca.setOffline(false);
+  await b.waitForSelector('.thread >> text=sent while offline', { timeout: 20000 });
+  assert.equal(await b.locator('.thread >> text=sent while offline').count(), 1, 'delivered once');
   for (const x of [a, b]) await x.evaluate(() => T.flush());
   await wait(1500);
   const fid = await admin('query', { view: 'v_intent_fidelity', origin: 'pilot', limit: 20 });

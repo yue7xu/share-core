@@ -1,6 +1,8 @@
 # IntentShare · Backend + Claude API + Interaction Logging 开发计划
 
 > 2026-10-26 · v2（已审阅：Q1 = pause LART；Q2 = Monica 最后自己加 key；新增 §11 CHI 2027 Interactive Demo）
+>
+> **执行状态（2026-10-26）**：P1–P8 的代码和本地测试全部完成，逐项情况见 `BUILD-LOG.md`。剩下要你在 dashboard 里操作的步骤写在 `SETUP.md`：Supabase 那边，LART 卡在 hibernating 状态；Vercel connector 没有创建 project 的权限；secret 也只能由你生成。
 > 接着 `09-build-brief-v2-intent-first.md` 和 artifact **IntentShare Messages**。前端先完全沿用 artifact 现在的样子，这份计划只管 backend、真实接入 Claude API、user research 数据收集。
 > 标记：✅ 已决定（我按推荐定了）｜❓ 需要你在审阅时回答｜⚠️ 风险
 
@@ -322,7 +324,7 @@ Admin console 直接显示这些 view，并能导出 CSV（给 R / Python 分析
 
 **C. CHI booth 现场** —— **默认什么都不记录**
 
-在会场收集访客数据需要单独的 IRB 批准，而且没有必要。Booth mode 只在本地计数（演示了几次、用了哪些场景），不存任何访客输入，不上传。
+在会场收集访客数据需要单独的 IRB 批准，而且没有必要。Booth mode 不记录任何 event 或 AI 调用。只有在用手机当 receiver 时，消息需要经过数据库转发，这部分标记为 `booth`，会后在 console 里一键删除（BUILD-LOG A11）。
 
 ### 11.3 时间上的依赖（倒推）
 

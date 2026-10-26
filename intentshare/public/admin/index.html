@@ -1,0 +1,357 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>IntentShare Console</title>
+<style>
+:root{--bg:#F3F4F6;--card:#FFFFFF;--line:#E2E4E9;--ink:#1C1C1E;--muted:#6B7078;--accent:#1B7CF4;--accent-ink:#fff;--ok:#1E7537;--bad:#C2271F;--warn:#9A5800;--field:#F2F2F5;
+  --f:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Noto Sans SC",system-ui,sans-serif;--mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#121214;--card:#1E1E20;--line:#36363A;--ink:#F2F2F7;--muted:#9A9AA2;--accent:#4B9DFF;--accent-ink:#0B0B0C;--ok:#62CF8A;--bad:#FF8B82;--warn:#F2B55A;--field:#2A2A2E;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#121214;--card:#1E1E20;--line:#36363A;--ink:#F2F2F7;--muted:#9A9AA2;--accent:#4B9DFF;--accent-ink:#0B0B0C;--ok:#62CF8A;--bad:#FF8B82;--warn:#F2B55A;--field:#2A2A2E;color-scheme:dark}
+*{box-sizing:border-box}[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--ink);font:13.5px/1.45 var(--f)}
+button,input,select,textarea{font:inherit;color:inherit}
+header{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;padding:12px 16px;border-bottom:1px solid var(--line);background:var(--card);position:sticky;top:0;z-index:5}
+header h1{font-size:15px;margin:0}
+nav{display:flex;flex-wrap:wrap;gap:4px}
+nav button{border:0;background:none;padding:5px 10px;border-radius:7px;cursor:pointer;color:var(--muted)}
+nav button[aria-pressed=true]{background:var(--field);color:var(--ink);font-weight:600}
+main{padding:16px;max-width:1500px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.card h2{font-size:14px;margin:0}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.muted{color:var(--muted)} .ok{color:var(--ok)} .bad{color:var(--bad)} .warn{color:var(--warn)}
+.btn{border:1px solid var(--line);background:var(--card);border-radius:8px;padding:5px 11px;cursor:pointer}
+.btn.pri{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:600}
+.btn.danger{color:var(--bad)}
+.inp{border:1px solid var(--line);background:var(--field);border-radius:7px;padding:5px 8px;min-width:0}
+.tw{overflow:auto;max-height:70vh;border:1px solid var(--line);border-radius:8px}
+table{border-collapse:collapse;width:100%;font-size:12.5px}
+th,td{padding:5px 8px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top;white-space:nowrap}
+td.wrap{white-space:normal;min-width:220px;max-width:420px}
+th{position:sticky;top:0;background:var(--card);font-weight:600;color:var(--muted);z-index:1}
+tr.click{cursor:pointer} tr.click:hover td{background:var(--field)}
+.num{text-align:right;font-variant-numeric:tabular-nums}
+.mono{font-family:var(--mono);font-size:12px}
+.kpis{display:flex;flex-wrap:wrap;gap:10px}
+.kpi{border:1px solid var(--line);border-radius:10px;padding:8px 12px;min-width:120px}
+.kpi b{display:block;font-size:18px;font-variant-numeric:tabular-nums}
+.kpi span{font-size:11.5px;color:var(--muted)}
+pre{white-space:pre-wrap;word-break:break-word;background:var(--field);border-radius:8px;padding:8px;margin:0;font-family:var(--mono);font-size:11.5px;max-height:320px;overflow:auto}
+details summary{cursor:pointer;color:var(--accent)}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:14px}
+.pill{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:0 7px;font-size:11.5px}
+.units label{display:flex;gap:8px;align-items:flex-start;padding:3px 0}
+.gate{min-height:100vh;display:grid;place-items:center;padding:16px}
+.gate .card{width:min(360px,100%)}
+</style>
+</head>
+<body>
+<div class="gate" id="gate"><div class="card"><h2>IntentShare researcher console</h2><p class="muted">Enter the admin token (Vercel → project → Settings → Environment Variables → ADMIN_TOKEN).</p>
+  <input class="inp" id="tok" type="password" aria-label="Admin token" autocomplete="off"><button class="btn pri" id="tokgo">Open</button><div class="bad" id="tokerr"></div></div></div>
+
+<div id="app" hidden>
+<header>
+  <h1>IntentShare console</h1>
+  <nav id="tabs"></nav>
+  <span class="row" style="margin-left:auto"><label class="muted" for="origin">Data</label>
+    <select class="inp" id="origin"><option value="study">study</option><option value="pilot">pilot</option><option value="demo">demo</option><option value="author">author</option><option value="eval">eval</option><option value="">all</option></select>
+    <span id="health" class="muted"></span></span>
+</header>
+<main id="main"></main>
+</div>
+
+<script>
+"use strict";
+/* Researcher console (plan §6.4, §8 P6, §11.2). Talks only to /api/admin/* with the admin token. */
+const $ = (s, r=document) => r.querySelector(s);
+function h(tag, attrs, ...kids){ const el = document.createElement(tag); for (const [k,v] of Object.entries(attrs||{})){ if (v==null||v===false) continue;
+  if (k==="class") el.className=v; else if (k.startsWith("on")) el.addEventListener(k.slice(2), v); else el.setAttribute(k, v===true?"":v); }
+  for (const c of kids.flat()){ if (c==null||c===false) continue; el.append(c.nodeType?c:document.createTextNode(String(c))); } return el; }
+let TOKEN = ""; try { TOKEN = sessionStorage.getItem("is_admin") || ""; } catch {}
+async function api(op, body){ const r = await fetch("/api/admin/"+op, {method:"POST", headers:{"Content-Type":"application/json", Authorization:"Bearer "+TOKEN}, body:JSON.stringify(body||{})});
+  const j = await r.json().catch(()=>({})); if (!r.ok) throw new Error(j.error || ("HTTP "+r.status)); return j; }
+async function getj(path){ const r = await fetch(path, {headers:{Authorization:"Bearer "+TOKEN}}); const j = await r.json(); if (!r.ok) throw new Error(j.error||r.status); return j; }
+const origin = () => $("#origin").value || null;
+const q = (view, extra) => api("query", Object.assign({view, origin: origin(), limit: 5000}, extra||{}));
+const fmtTs = (t) => t ? new Date(t).toLocaleString([], {month:"short", day:"numeric", hour:"2-digit", minute:"2-digit", second:"2-digit"}) : "";
+const n = (v, d) => { if (typeof d !== "number") d = 1; return v==null || v==="" ? "" : (Math.round(Number(v)*10**d)/10**d).toString(); };
+const pct = (a, b) => b ? Math.round(100*a/b) + "%" : "–";
+function quant(arr, p){ const s = arr.filter(x => x!=null && !isNaN(x)).map(Number).sort((a,b)=>a-b); if (!s.length) return null; const i = (s.length-1)*p; const lo = Math.floor(i), hi = Math.ceil(i); return s[lo] + (s[hi]-s[lo])*(i-lo); }
+
+/* Generic table: cols = [[key, label, fmt?, cls?]] */
+function table(rows, cols, onRow){
+  const tw = h("div",{class:"tw"});
+  const t = h("table",null, h("thead",null, h("tr",null, cols.map(c => h("th",{class:c[3]||""}, c[1])))),
+    h("tbody",null, rows.map(r => { const tr = h("tr",{class: onRow ? "click" : ""}, cols.map(c => { const v = c[2] ? c[2](r[c[0]], r) : r[c[0]];
+      return h("td",{class:c[3]||""}, v==null ? "" : (v.nodeType ? v : typeof v === "object" ? JSON.stringify(v) : String(v))); }));
+      if (onRow) tr.addEventListener("click", () => onRow(r)); return tr; })));
+  tw.append(t); if (!rows.length) tw.append(h("div",{class:"muted", style:"padding:10px"},"No rows."));
+  return tw;
+}
+const card = (title, ...kids) => h("section",{class:"card"}, title ? h("h2",null,title) : null, ...kids);
+const kpi = (v, label) => h("div",{class:"kpi"}, h("b",null, v==null?"–":v), h("span",null,label));
+function confirmBtn(label, fn, cls){ const b = h("button",{class:"btn "+(cls||"")}, label); let armed = false;
+  b.addEventListener("click", async () => { if (!armed){ armed = true; b.textContent = "Click again to confirm"; setTimeout(() => { armed=false; b.textContent = label; }, 4000); return; } b.disabled = true; try { await fn(); } finally { b.disabled = false; armed=false; b.textContent = label; } }); return b; }
+
+/* ------------------------------------------------------------ Tabs */
+const TABS = {
+  async Pairs(m){
+    const o = await api("overview", {origin: origin()});
+    const tt = o.totals;
+    m.append(card("Totals (all data)", h("div",{class:"kpis"}, kpi(tt.events.toLocaleString(),"events"), kpi(tt.ai_calls.toLocaleString(),"AI calls"),
+      kpi((tt.input_tokens/1000).toFixed(1)+"k","input tokens"), kpi((tt.output_tokens/1000).toFixed(1)+"k","output tokens"), kpi((tt.cache_read_tokens/1000).toFixed(1)+"k","cache-read tokens"))));
+    // create pair
+    const f = {label:h("input",{class:"inp", placeholder:"P01"}), a:h("input",{class:"inp", placeholder:"Name A"}), b:h("input",{class:"inp", placeholder:"Name B"}),
+      rel:h("select",{class:"inp"}, ["friends","romantic partners","family","roommates","classmates","other"].map(x => h("option",null,x))),
+      known:h("input",{class:"inp", placeholder:"known for (e.g. 3 years)"}), origin:h("select",{class:"inp"}, ["study","pilot"].map(x => h("option",null,x))),
+      days:h("input",{class:"inp", type:"number", value:"3", min:"1", style:"width:70px"}), mode:h("select",{class:"inp"}, ["ai","baseline","schedule"].map(x => h("option",null,x)))};
+    const out = h("div",{class:"mono"});
+    m.append(card("New pair", h("div",{class:"row"}, f.label, f.a, f.b, f.rel, f.known, h("span",{class:"muted"},"origin"), f.origin, h("span",{class:"muted"},"days"), f.days, h("span",{class:"muted"},"condition"), f.mode,
+      h("button",{class:"btn pri", onclick: async () => { const r = await api("pair_create", {label:f.label.value||"pair", names:{A:f.a.value||"A", B:f.b.value||"B"}, relationship_type:f.rel.value,
+        known_duration:f.known.value, data_origin:f.origin.value, study_days:Number(f.days.value)||null, condition_mode:f.mode.value});
+        out.textContent = `Created ${r.pair.label}: A = ${r.A.display_name} code ${r.A.code} · B = ${r.B.display_name} code ${r.B.code} · join at ${location.origin}/join`; render(); }}, "Create")), out,
+      h("p",{class:"muted"}, "Schedule format (counterbalancing): [{\"from\":\"2026-12-01\",\"condition\":\"ai\"},{\"from\":\"2026-12-03\",\"condition\":\"baseline\"}] — dates in America/New_York.")));
+    m.append(card("Pairs", table(o.pairs, [
+      ["pair", "Pair", (p) => p.label], ["pair","Origin", (p) => p.data_origin], ["condition_today","Today"],
+      ["pair","Mode", (p) => p.condition_mode + (p.condition_mode==="schedule" ? " " + JSON.stringify(p.condition_schedule) : "")],
+      ["participants","A", (ps) => ps && ps[0] ? `${ps[0].display_name} · ${ps[0].code}${ps[0].locked?" · locked":""}` : "", "mono"],
+      ["participants","B", (ps) => ps && ps[1] ? `${ps[1].display_name} · ${ps[1].code}${ps[1].locked?" · locked":""}` : "", "mono"],
+      ["participants","Ends", (ps) => ps && ps[0] && ps[0].study_ends_at ? fmtTs(ps[0].study_ends_at) : ""],
+      ["messages","Msgs",null,"num"], ["shares","Shares",null,"num"], ["last_event","Last activity", fmtTs],
+    ], (r) => pairEditor(r))));
+    m.append(card("Booth data", h("p",{class:"muted"},"Booth mode never stores events or AI calls. Two-device booth demos relay messages through the database (tagged booth); remove them after the conference."),
+      h("div",null, confirmBtn("Delete all booth pairs", async () => { const r = await api("purge_booth"); alert_(`Deleted ${r.deleted_pairs} booth pairs.`); render(); }, "danger"))));
+  },
+  async Live(m){
+    const box = h("div"); m.append(card("Live events (newest first, refreshes every 3 s)", box));
+    let since = null, rows = [];
+    const tick = async () => { if (!document.body.contains(box)) return; try { const r = await api("events_tail", {since, origin: origin(), limit: 200});
+      if (r.length){ since = r[0].server_ts; rows = r.concat(rows).slice(0, 400); box.replaceChildren(table(rows, [["server_ts","Server time",fmtTs],["code","Code",null,"mono"],["role","Role"],["type","Type",null,"mono"],["condition","Cond"],["payload","Payload",(p)=>p?JSON.stringify(p).slice(0,160):"","wrap mono"]])); }
+      else if (!rows.length) box.replaceChildren(h("p",{class:"muted"},"Waiting for events…")); } catch(e){ box.replaceChildren(h("p",{class:"bad"}, e.message)); } setTimeout(tick, 3000); };
+    tick();
+  },
+  async Shares(m){
+    const rows = await q("v_share_funnel");
+    const sent = rows.filter(r => r.outcome==="sent_card"), ai = rows.filter(r => r.condition==="ai"), base = rows.filter(r => r.condition==="baseline");
+    m.append(card("Sender side (one row per share)", h("div",{class:"kpis"},
+      kpi(rows.length,"shares"), kpi(pct(sent.length, ai.length),"AI condition: sent as card"), kpi(pct(ai.filter(r=>r.outcome==="sent_plain").length, ai.length),"sent as plain link instead"),
+      kpi(pct(sent.filter(r=>r.sent_unchanged).length, sent.length),"cards sent unchanged"), kpi(n(quant(sent.map(r=>r.regenerations),0.5)),"median regenerations"),
+      kpi(n(quant(ai.map(r=>r.s_open_to_card),0.5)),"median s open→card"), kpi(n(quant(ai.map(r=>r.s_in_preview),0.5)),"median s in preview"),
+      kpi(n(quant(rows.map(r=>r.clicks_total),0.5)),"median clicks / share"), kpi(n(quant(base.map(r=>r.s_total),0.5)),"baseline median s total")),
+      table(rows.sort((a,b) => (b.created_at||"").localeCompare(a.created_at||"")), [
+        ["created_at","When",fmtTs],["participant_code","Who",null,"mono"],["condition","Cond"],["trigger_kind","Trigger"],["scenario_id","Sample"],["outcome","Outcome"],
+        ["s_compose_to_trigger","compose→trigger s",n,"num"],["s_open_to_intent","open→intent s",n,"num"],["s_open_to_card","open→card s",n,"num"],["s_card_to_decision","card→decision s",n,"num"],["s_total","total s",n,"num"],
+        ["clicks_total","clicks",null,"num"],["clicks_in_preview","in preview",null,"num"],["keystrokes","keys",null,"num"],["regenerations","regen",null,"num"],["intent_edits","edits",null,"num"],["type_changes","type chg",null,"num"],
+        ["gap_shown","gap?",(v,r)=>v?(r.gap_answered?"answered":"shown"):""],["s_ai_wait","AI wait s",n,"num"],["message_text","Message",null,"wrap"],["link_url","Link",null,"wrap mono"]], shareDetail)));
+  },
+  async Receiver(m){
+    const rows = await q("v_receiver_timeline");
+    const cards = rows.filter(r=>r.kind==="card"), plain = rows.filter(r=>r.kind==="plain");
+    m.append(card("Receiver side (one row per shared item)", h("div",{class:"kpis"},
+      kpi(rows.length,"items"), kpi(pct(rows.filter(r=>r.seen_at).length, rows.length),"seen"),
+      kpi(pct(cards.filter(r=>r.chip_clicks>0).length, cards.length),"cards: chip clicked"), kpi(n(quant(cards.map(r=>r.s_seen_to_reply),0.5)),"cards: median s seen→reply"),
+      kpi(n(quant(plain.map(r=>r.s_seen_to_reply),0.5)),"plain: median s seen→reply")),
+      table(rows, [["delivered_at","Delivered",fmtTs],["kind","Kind"],["receiver_code","Receiver",null,"mono"],["s_delivered_to_seen","→seen s",n,"num"],["s_seen_to_first_chip","seen→chip s",n,"num"],
+        ["s_seen_to_reply","seen→reply s",n,"num"],["chip_clicks","chips",null,"num"],["open_original_clicks","open orig",null,"num"],["action_clicks","actions",null,"num"],["s_dwell","dwell s",n,"num"],
+        ["reply_text","Reply",null,"wrap"]], (r) => r.share_id && shareDetail({share_id:r.share_id}))));
+  },
+  async Fidelity(m){
+    const rows = await q("v_intent_fidelity");
+    m.append(card("Intent transfer fidelity inputs (m1a / m1b / m2 / post rating)", h("p",{class:"muted"},"Code m1a and m2 in the Coding tab; agreement is computed there."),
+      table(rows, [["created_at","When",fmtTs],["condition","Cond"],["ai_primary","AI type",null,"mono"],["message_text","Message",null,"wrap"],["m1a","m1a (sender)",null,"wrap"],["m1b","m1b",null,"num"],["m2","m2 (receiver)",null,"wrap"],["post_rating","post",null,"num"]], (r)=>shareDetail(r))));
+  },
+  async Daily(m){
+    const rows = await q("v_daily_compliance");
+    m.append(card("Daily compliance (≥3 shares per person per day)", table(rows.sort((a,b)=>(a.day+a.participant_code).localeCompare(b.day+b.participant_code)), [
+      ["day","Day"],["participant_code","Code",null,"mono"],["shares_sent","Shares",(v)=>h("span",{class: v>=3?"ok":"warn"}, String(v)),"num"],["messages_sent","Messages",null,"num"],["active_minutes","Active min",null,"num"],["sessions","Sessions",null,"num"]])));
+  },
+  async "AI & eval"(m){
+    const rows = await q("v_ai_quality");
+    const byTask = {};
+    for (const r of rows) (byTask[r.task] ||= []).push(r);
+    m.append(card("AI calls", h("div",{class:"kpis"}, ...Object.entries(byTask).flatMap(([t, rs]) => [
+      kpi(rs.length, t+" calls"), kpi(n(quant(rs.map(r=>r.latency_ms),0.5),0)+" / "+n(quant(rs.map(r=>r.latency_ms),0.95),0), t+" ms p50 / p95"),
+      t==="intent" ? kpi(pct(rs.filter(r=>r.primary_match===true).length, rs.filter(r=>r.primary_match!=null).length), "intent = expected (samples)") : null,
+      kpi(pct(rs.filter(r=>r.error).length, rs.length), t+" errors")]))));
+    const fails = rows.filter(r => r.primary_match===false || r.fallback || r.error || r.gap_question).slice(0, 200);
+    m.append(card("Failure gallery (mismatch, fallback, gap question, error) — for Limitations", table(fails, [["created_at","When",fmtTs],["task","Task"],["scenario_id","Item"],["expected_type","Expected",null,"mono"],["ai_primary","AI",null,"mono"],
+      ["ai_confidence","Conf"],["fallback","Fallback"],["gap_question","Gap"],["error","Error"],["model","Model",null,"mono"],["prompt_version","Prompt",null,"mono"]], (r)=> r.share_id && shareDetail(r))));
+    m.append(evalRunner());
+  },
+  async Coding(m){ m.append(await codingPanel()); },
+  async Export(m){
+    const views = ["v_share_funnel","v_share_timeline","v_receiver_timeline","v_intent_fidelity","v_daily_compliance","v_ai_quality","v_data_quality","events","messages","shares","cards","card_versions","ai_calls","survey_answers","sessions","participants","pairs","codes","eval_runs"];
+    m.append(card("Download (" + (origin()||"all origins") + ")", h("p",{class:"muted"},"CSV for R / Python / SPSS; JSONL keeps nested payloads intact. Links contain your admin token — don't share them."),
+      table(views.map(v => ({v})), [["v","Table / view",null,"mono"],["v","CSV",(v)=>h("a",{href:`/api/admin/export?view=${v}&format=csv${origin()?"&origin="+origin():""}&token=${encodeURIComponent(TOKEN)}`},"csv")],
+        ["v","JSONL",(v)=>h("a",{href:`/api/admin/export?view=${v}&format=jsonl${origin()?"&origin="+origin():""}&token=${encodeURIComponent(TOKEN)}`},"jsonl")]])));
+  },
+  async "Data quality"(m){
+    const rows = await api("query", {view:"v_data_quality", limit:2000});
+    m.append(card("Logging health per session", h("p",{class:"muted"},"missing_seq > 0 means events were lost in transit; client_ahead means the device clock was ahead of the server; clock_offset_ms is used to align cross-device timings."),
+      table(rows, [["started_at","Session start",fmtTs],["mode","Mode"],["events","Events",null,"num"],["missing_seq","Missing",(v)=>h("span",{class:Number(v)>0?"bad":"ok"},String(v)),"num"],["client_ahead","Clock ahead",null,"num"],["max_upload_delay_s","Max delay s",n,"num"],["clock_offset_ms","Offset ms",null,"num"]])));
+  },
+};
+
+function alert_(t){ const d = h("div",{class:"card", role:"status", style:"position:fixed;right:16px;bottom:16px;z-index:9;max-width:420px"}, t); document.body.append(d); setTimeout(()=>d.remove(), 5000); }
+
+function pairEditor(r){
+  const ps = r.participants || [];
+  const mode = h("select",{class:"inp"}, ["ai","baseline","schedule"].map(x => h("option",{selected:x===r.pair.condition_mode},x)));
+  const sched = h("input",{class:"inp mono", style:"min-width:340px", value: JSON.stringify(r.pair.condition_schedule||[])});
+  const ends = h("input",{class:"inp", type:"datetime-local", value: ps[0] && ps[0].study_ends_at ? new Date(ps[0].study_ends_at).toISOString().slice(0,16) : ""});
+  const incl = h("input",{type:"checkbox"});
+  const dlg = card("Edit " + r.pair.label,
+    h("div",{class:"row"}, h("span",{class:"muted"},"Condition"), mode, sched, h("span",{class:"muted"},"Study ends"), ends,
+      h("button",{class:"btn pri", onclick: async () => { let sc; try { sc = JSON.parse(sched.value||"[]"); } catch { return alert_("Schedule is not valid JSON."); }
+        await api("pair_update", {pair_id:r.pair.id, condition_mode:mode.value, condition_schedule:sc, study_ends_at: ends.value ? new Date(ends.value).toISOString() : null}); alert_("Saved."); render(); }}, "Save")),
+    h("div",{class:"row"}, h("span",{class:"muted"},"Withdraw (deletes all their data):"),
+      ...ps.map(p => confirmBtn(`Withdraw ${p.role} (${p.display_name})`, async () => { await api("withdraw", {participant_id:p.id, include_partner:incl.checked}); alert_("Withdrawn and deleted."); render(); }, "danger")),
+      h("label",{class:"row muted"}, incl, "also delete the partner's messages in this chat")),
+    h("div",null, h("button",{class:"btn", onclick:()=>dlg.remove()}, "Close")));
+  $("#main").prepend(dlg);
+}
+
+async function shareDetail(r){
+  const d = await api("share_detail", {share_id: r.share_id || r.id});
+  const sec = card("Share " + (d.share ? (d.share.scenario_id || "") + " · " + (d.share.message_text || "(no message)") : r.share_id));
+  if (d.funnel) sec.append(h("div",{class:"kpis"}, kpi(n(d.funnel.s_total),"total s"), kpi(d.funnel.clicks_total,"clicks"), kpi(d.funnel.keystrokes,"keystrokes"), kpi(d.funnel.regenerations,"regenerations"), kpi(d.funnel.outcome,"outcome")));
+  sec.append(h("h2",null,"Step by step"), table(d.timeline, [["step_no","#",null,"num"],["step","Step",null,"mono"],["started_at","At",fmtTs],["duration_s","Duration s",n,"num"],["clicks","Clicks",null,"num"],["keystrokes","Keys",null,"num"],["payload","Detail",(p)=>p?JSON.stringify(p).slice(0,200):"","wrap mono"]]));
+  sec.append(h("h2",null,"AI calls"), ...d.ai_calls.map(c => h("details",null, h("summary",null, `${c.task} · attempt ${c.attempt} · ${c.model} · ${c.latency_ms} ms · in ${c.input_tokens??"–"} / out ${c.output_tokens??"–"} tokens${c.error?" · ERROR "+c.error:""}`),
+    h("div",{class:"grid2"}, h("div",null,h("b",null,"System prompt"), h("pre",null,c.system_prompt||"")), h("div",null,h("b",null,"User prompt"), h("pre",null,c.user_prompt||"")),
+      h("div",null,h("b",null,"Raw output"), h("pre",null,c.raw_output||"")), h("div",null,h("b",null,"Normalized"), h("pre",null,JSON.stringify(c.normalized,null,1)))))));
+  sec.append(h("h2",null,"Card versions"), ...d.versions.map(v => h("details",null, h("summary",null, `v${v.version} · ${v.intent && v.intent.primary}${v.edited_intent?" · edited by sender":""}${v.clarification?" · clarified: "+v.clarification:""}`), h("pre",null, JSON.stringify(v.extraction,null,1)))));
+  if (d.receiver.length) sec.append(h("h2",null,"Receiver"), table(d.receiver, [["s_delivered_to_seen","→seen s",n,"num"],["s_seen_to_first_chip","seen→chip s",n,"num"],["s_seen_to_reply","seen→reply s",n,"num"],["chip_clicks","chips",null,"num"],["reply_text","Reply",null,"wrap"]]));
+  if (d.surveys.length) sec.append(h("h2",null,"Study questions"), table(d.surveys, [["item","Item"],["value","Answer",null,"wrap"],["skipped","Skipped"],["answered_at","At",fmtTs]]));
+  sec.append(h("details",null, h("summary",null, `All ${d.events.length} raw events`), table(d.events, [["seq","seq",null,"num"],["perf_ms","perf ms",null,"num"],["type","type",null,"mono"],["payload","payload",(p)=>p?JSON.stringify(p):"","wrap mono"]])));
+  sec.append(h("div",null, h("button",{class:"btn", onclick:()=>sec.remove()}, "Close")));
+  $("#main").prepend(sec); scrollTo(0,0);
+}
+
+/* ------------------------------------------------------------ Evaluation runner (plan §11.2-A) */
+function evalRunner(){
+  const set = h("select",{class:"inp"}, ["scenarios","heldout","both"].map(x=>h("option",null,x)));
+  const reps = h("input",{class:"inp", type:"number", value:"1", min:"1", max:"5", style:"width:60px"});
+  const tier = h("select",{class:"inp"}, ["default","quick"].map(x=>h("option",null,x)));
+  const co = h("input",{type:"checkbox", checked:true});
+  const out = h("div"), prog = h("span",{class:"muted"});
+  const go = h("button",{class:"btn pri", onclick: async () => {
+    go.disabled = true;
+    try {
+      const items = await getj("/api/admin/eval");
+      const codes = await api("query", {view:"codes", limit:20000});
+      const consensus = consensusTypes(codes, "heldout");
+      let list = []; if (set.value!=="heldout") list = list.concat(items.scenarios); if (set.value!=="scenarios") list = list.concat(items.heldout.map(x => Object.assign({}, x, {expected: consensus[x.id] || x.proposed, provisional: !consensus[x.id]})));
+      const jobs = []; for (let i=0;i<Number(reps.value||1);i++) jobs.push(...list);
+      const health = await (await fetch("/api/health")).json();
+      const run = await api("eval_run_start", {label: `${set.value} ×${reps.value} ${tier.value}`, prompt_version: health.promptVersion, models: health.models});
+      const results = []; let done = 0;
+      const worker = async () => { while (jobs.length){ const it = jobs.shift();
+        const r = await fetch("/api/admin/eval", {method:"POST", headers:{"Content-Type":"application/json", Authorization:"Bearer "+TOKEN}, body:JSON.stringify({run_id:run.id, item:it, tier:tier.value, content_only:co.checked})}).then(x=>x.json()).catch(e=>({id:it.id, error:String(e)}));
+        results.push(Object.assign({expected: it.expected, provisional: it.provisional, kind: it.kind, message: it.message}, r)); done++; prog.textContent = `${done} / ${done+jobs.length}`; } };
+      await Promise.all([worker(), worker()]);
+      const anchorCodes = latestCodes(codes, "anchor");
+      const summary = summarizeEval(results, anchorCodes);
+      await api("eval_run_finish", {id: run.id, summary});
+      out.replaceChildren(renderEval(summary, results));
+    } catch(e){ out.replaceChildren(h("p",{class:"bad"}, e.message)); } finally { go.disabled = false; }
+  }}, "Run evaluation");
+  return card("Technical evaluation", h("p",{class:"muted"}, "Runs the live pipeline on the 17 samples and/or the 60 held-out messages. Held-out items use the coders' consensus type when it exists, otherwise the provisional label (marked). Anchor precision/recall needs anchor codes (Coding → Anchors)."),
+    h("div",{class:"row"}, "Set", set, "Repeats", reps, "Model", tier, h("label",{class:"row"}, co, "also run the content-only baseline"), go, prog), out);
+}
+function latestCodes(codes, kind){ const m = {}; for (const c of codes.filter(c=>c.item_kind===kind)) (m[c.item_id] ||= []).push(c); return m; }
+function consensusTypes(codes, kind){ const by = latestCodes(codes, kind), out = {}; for (const [id, cs] of Object.entries(by)){ const t = cs.map(c=>c.code.type).filter(Boolean); if (t.length>=2 && t.every(x=>x===t[0])) out[id] = t[0]; } return out; }
+function pr(pred, gold){ const P = new Set(pred.flat()), G = new Set(gold); if (!G.size) return null; const tp = [...P].filter(x=>G.has(x)).length; return {p: P.size ? tp/P.size : 0, r: tp/G.size}; }
+function summarizeEval(rs, anchorCodes){
+  const ok = rs.filter(r=>!r.error);
+  const acc = (xs) => xs.length ? ok.filter(r=>xs.includes(r) && r.primary===r.expected).length / xs.length : null;
+  const sc = ok.filter(r=>r.kind==="scenario"), ho = ok.filter(r=>r.kind==="heldout"), hoFinal = ho.filter(r=>!r.provisional);
+  const confusion = {}; for (const r of ok) { const k = r.expected + " → " + r.primary; if (r.primary!==r.expected) confusion[k] = (confusion[k]||0)+1; }
+  const anchor = [], baseline = [];
+  for (const r of sc){ const codes = anchorCodes[r.id]; if (!codes) continue; const gold = codes[0].code.units || [];
+    const a = pr(r.anchors||[], gold); if (a) anchor.push(a); if (r.content_only_anchors){ const b = pr(r.content_only_anchors, gold); if (b) baseline.push(b); } }
+  const mean = (xs, k) => xs.length ? xs.reduce((s,x)=>s+x[k],0)/xs.length : null;
+  return { n: rs.length, errors: rs.length-ok.length,
+    intent_acc_scenarios: acc(sc), intent_acc_heldout: acc(ho), intent_acc_heldout_coded: acc(hoFinal), heldout_coded_n: hoFinal.length,
+    intent_ms_p50: quant(ok.map(r=>r.intent_ms),0.5), intent_ms_p95: quant(ok.map(r=>r.intent_ms),0.95),
+    extract_ms_p50: quant(ok.map(r=>r.extract_ms),0.5), extract_ms_p95: quant(ok.map(r=>r.extract_ms),0.95),
+    gap_rate: ok.filter(r=>r.gap).length/Math.max(1,ok.length), fallback_rate: ok.filter(r=>r.fallback).length/Math.max(1,ok.length),
+    anchor_precision: mean(anchor,"p"), anchor_recall: mean(anchor,"r"), anchor_n: anchor.length,
+    content_only_precision: mean(baseline,"p"), content_only_recall: mean(baseline,"r"), confusion };
+}
+function renderEval(s, rs){
+  const p = (v) => v==null ? "–" : Math.round(v*100)+"%";
+  return h("div",{class:"card"}, h("div",{class:"kpis"}, kpi(p(s.intent_acc_scenarios),"intent = expected (samples)"), kpi(p(s.intent_acc_heldout),"held-out (incl. provisional)"),
+    kpi(p(s.intent_acc_heldout_coded)+" (n="+s.heldout_coded_n+")","held-out, coder consensus"), kpi(n(s.intent_ms_p50,0)+" / "+n(s.intent_ms_p95,0),"intent ms p50/p95"),
+    kpi(n(s.extract_ms_p50,0)+" / "+n(s.extract_ms_p95,0),"extract ms p50/p95"), kpi(p(s.anchor_precision)+" / "+p(s.anchor_recall),"anchor P / R (n="+s.anchor_n+")"),
+    kpi(p(s.content_only_precision)+" / "+p(s.content_only_recall),"content-only P / R"), kpi(p(s.gap_rate),"gap question"), kpi(s.errors,"errors")),
+    h("details",null, h("summary",null,"Confusions"), h("pre",null, JSON.stringify(s.confusion,null,1))),
+    table(rs, [["id","Item"],["kind","Set"],["message","Message",null,"wrap"],["expected","Expected",(v,r)=>(v||"")+(r.provisional?" *":""),"mono"],["primary","AI",(v,r)=>h("span",{class:v===r.expected?"ok":"bad"},v||r.error||""),"mono"],["confidence","Conf"],["intent_ms","intent ms",null,"num"],["extract_ms","extract ms",null,"num"],["anchors","Anchors",(a)=>a?JSON.stringify(a):"","mono"],["summary","Summary",null,"wrap"]]));
+}
+
+/* ------------------------------------------------------------ Coding + agreement */
+async function codingPanel(){
+  let coder = ""; try { coder = localStorage.getItem("is_coder") || ""; } catch {}
+  const who = h("input",{class:"inp", value:coder, placeholder:"Your coder name (e.g. MX)"}); who.addEventListener("change", () => { try { localStorage.setItem("is_coder", who.value.trim()); } catch {} });
+  const kind = h("select",{class:"inp"}, [["heldout","Held-out messages (type)"],["m1a","Sender m1a answers (type)"],["m2","Receiver m2 answers (type)"],["anchor","Sample content: relevant parts (anchors)"]].map(([v,l])=>h("option",{value:v},l)));
+  const body = h("div"), agree = h("div");
+  const wrap = card("Coding", h("p",{class:"muted"},"Code blind: you never see the AI's label or the other coder's codes here. Agreement (Cohen's κ) uses the first two coders of each item."), h("div",{class:"row"}, "Coder", who, "Items", kind), agree, body);
+  const boot = await (await fetch("/api/bootstrap")).json();
+  const TYPES = boot.order;
+  async function load(){
+    const codes = await api("query", {view:"codes", limit:20000});
+    const mine = {}; for (const c of codes.filter(c=>c.coder===who.value.trim() && c.item_kind===kind.value)) mine[c.item_id] = c.code;
+    agree.replaceChildren(agreement(codes, kind.value));
+    let items = [];
+    if (kind.value==="heldout"){ const e = await getj("/api/admin/eval"); items = e.heldout.map(x=>({id:x.id, text:x.message || "(no message, just a link)", sub:x.content_ref})); }
+    if (kind.value==="m1a" || kind.value==="m2"){ const f = await q("v_intent_fidelity"); items = f.filter(r=>r[kind.value]).map(r=>({id:r[kind.value+"_answer_id"], text:r[kind.value], sub:"message: " + (r.message_text||"")})); }
+    if (kind.value==="anchor"){
+      body.replaceChildren(...boot.scenarios.map(sc => { const c = boot.content[sc.url || sc.photo]; if (!c) return null; const sel = new Set((mine[sc.id]||{}).units||[]);
+        return h("details",null, h("summary",null, `${sc.id} · ${sc.msg || "(no message)"} ${mine[sc.id] ? "✓" : ""}`), h("div",{class:"units"}, c.units.map(u => { const cb = h("input",{type:"checkbox", checked: sel.has(u.unitId)});
+          cb.addEventListener("change", async () => { cb.checked ? sel.add(u.unitId) : sel.delete(u.unitId); if (!who.value.trim()) return alert_("Enter your coder name first.");
+            await api("code_upsert", {coder:who.value.trim(), item_kind:"anchor", item_id:sc.id, code:{units:[...sel]}}); });
+          return h("label",null, cb, h("span",{class:"mono"}, u.unitId), u.text); }))); }));
+      return;
+    }
+    body.replaceChildren(table(items, [["id","Item",null,"mono"],["text","Text",null,"wrap"],["sub","Context",null,"wrap muted"],["id","Your code",(id)=>{ const s = h("select",{class:"inp"}, h("option",{value:""},"—"), TYPES.map(t=>h("option",{value:t, selected:(mine[id]||{}).type===t}, t)), h("option",{value:"UNCODABLE", selected:(mine[id]||{}).type==="UNCODABLE"},"UNCODABLE"));
+      s.addEventListener("change", async () => { if (!who.value.trim()) return alert_("Enter your coder name first."); await api("code_upsert", {coder:who.value.trim(), item_kind:kind.value, item_id:id, code:{type:s.value}}); }); return s; }]]));
+  }
+  kind.addEventListener("change", load); who.addEventListener("change", load); load();
+  return wrap;
+}
+function agreement(codes, kind){
+  const by = latestCodes(codes, kind);
+  if (kind==="anchor") return h("p",{class:"muted"}, `${Object.keys(by).length} samples have anchor codes.`);
+  const pairs = Object.values(by).filter(cs => cs.length>=2).map(cs => [cs[0].code.type, cs[1].code.type]).filter(p=>p[0]&&p[1]);
+  if (!pairs.length) return h("p",{class:"muted"}, "Agreement appears once two coders have coded the same items.");
+  const cats = [...new Set(pairs.flat())], N = pairs.length;
+  const po = pairs.filter(p=>p[0]===p[1]).length/N;
+  const pe = cats.reduce((s,c)=> s + (pairs.filter(p=>p[0]===c).length/N)*(pairs.filter(p=>p[1]===c).length/N), 0);
+  const k = pe===1 ? 1 : (po-pe)/(1-pe);
+  return h("div",{class:"kpis"}, kpi(N,"items coded by 2"), kpi(Math.round(po*100)+"%","raw agreement"), kpi(k.toFixed(2),"Cohen's κ"));
+}
+
+/* ------------------------------------------------------------ Shell */
+let current = "Pairs";
+function render(){
+  $("#tabs").replaceChildren(...Object.keys(TABS).map(t => h("button",{"aria-pressed":String(t===current), onclick:()=>{ current=t; render(); }}, t)));
+  const m = $("#main"); m.replaceChildren(h("p",{class:"muted"},"Loading…"));
+  TABS[current](Object.assign(m, {})).then(() => { const l = m.querySelector(":scope > p.muted"); if (l && l.textContent==="Loading…") l.remove(); })
+    .catch(e => m.replaceChildren(card("Error", h("p",{class:"bad"}, e.message), e.message==="unauthorized" ? h("button",{class:"btn", onclick:()=>{ try{sessionStorage.removeItem("is_admin")}catch{}; location.reload(); }}, "Re-enter token") : null)));
+}
+$("#origin").addEventListener("change", render);
+async function start(){
+  try { await api("overview", {}); } catch(e){ $("#gate").hidden = false; $("#app").hidden = true; if (TOKEN) $("#tokerr").textContent = "That token didn't work."; return; }
+  $("#gate").hidden = true; $("#app").hidden = false;
+  fetch("/api/health").then(r=>r.json()).then(hh => { $("#health").replaceChildren(h("span",{class: hh.ok ? "ok" : "bad"}, "DB " + hh.db), " · AI " + hh.ai + " · prompt " + hh.promptVersion,
+    ...(hh.warnings||[]).map(w => h("span",{class:"warn", style:"display:block"}, "⚠ " + w))); });
+  render();
+}
+$("#tokgo").addEventListener("click", () => { TOKEN = $("#tok").value.trim(); try { sessionStorage.setItem("is_admin", TOKEN); } catch {} start(); });
+$("#tok").addEventListener("keydown", (e) => { if (e.key==="Enter") $("#tokgo").click(); });
+start();
+</script>
+</body>
+</html>

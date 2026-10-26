@@ -38,6 +38,15 @@ function snapshot(){
   if (text === Draft.lastSnap && !Draft.keys && !Draft.deletes) return;
   T.log("compose.input", {text, length:text.length, keys:Draft.keys, deletes:Draft.deletes});
   Draft.keys = 0; Draft.deletes = 0; Draft.lastSnap = text;
+  logLink();
+}
+/* Logged once per draft when typing pauses (not on a half-typed URL), or at send / preview at the latest. */
+function logLink(){
+  if (!Draft.id || Draft.linkLogged) return;
+  const link = findLink({text:input.value, attachment:UI.attachment}); if (!link) return;
+  Draft.linkLogged = true;
+  const url = link.type==="attachment" ? link.ref : link.url;
+  T.log("share.link_detected", {url, host:hostOf(url), with_text: !!input.value.replace(URL_RE, "").trim(), attachment: link.type==="attachment"});
 }
 function draftReset(){ snapshot(); Draft.id = null; Draft.scenario = null; Draft.scenarioText = null; Draft.lastSnap = ""; }
 
@@ -225,11 +234,17 @@ async function persist(entry, extra){
     if (r && r.server_ts) entry.serverTs = r.server_ts;
   } catch (e) {
     entry.failed = true;
-    if (e.code === "locked") setLocked(true);
-    toast(e.code === "locked" ? "The study period has ended, so new messages aren't sent." : "This message couldn't be delivered. Check your connection.");
+    if (e.code === "locked") { setLocked(true); toast("The study period has ended, so new messages aren't sent."); }
+    else {
+      if (!entry.retries) toast("This message couldn't be delivered yet. It will be sent when you're back online.");
+      entry.retries = (entry.retries || 0) + 1;
+      // Same message id, so a retry can never create a duplicate.
+      if (entry.retries <= 30) setTimeout(() => persist(entry, extra), Math.min(30000, 2000 * entry.retries));
+    }
   }
   renderThread();
 }
+addEventListener("online", () => { const c = CONVS.R; if (c) for (const m of c.thread) if (m.failed && m.retries) persist(m, {shareId:m.shareId}); });
 async function excludeMessage(m){
   try {
     await Net.call("/api/messages/exclude", {body:{message_id:m.id, participant_id:pidOf(m.from)}});
@@ -295,10 +310,9 @@ const widget = (function(){
   function refresh(){
     if (s) { trig.hidden = true; return; }
     const info = draftInfo();
-    if (info && Draft.id && !Draft.linkLogged){ Draft.linkLogged = true; T.log("share.link_detected", {url: info.content.sourceUrl, host: hostOf(info.content.sourceUrl), with_text: !!info.rawNote}); }
     if (!info || STATE.cond==="baseline"){ hideTrig(); return; }
     trig.hidden = false;
-    if (trigShownFor !== Draft.id){ trigShownFor = Draft.id; T.log("share.trigger_shown", {kind:info.triggerKind}); }
+    if (trigShownFor !== Draft.id){ trigShownFor = Draft.id; T.log("share.trigger_shown", {kind:info.triggerKind, url_so_far:info.content.sourceUrl}); }
     trig.replaceChildren(h("span",{class:"sp"},"✦"),
       h("span",{class:"g"}, info.intentSource ? "Share card · your last message will be used as the intent" : "Share card · you'll review it before it's sent"),
       h("button",{class:"link", type:"button", "data-track":"trigger-preview", onclick:() => open(info, "preview_link")}, "Preview"));
@@ -310,6 +324,7 @@ const widget = (function(){
     snapshot();
     if (STATE.cond==="baseline"){
       const shareId = draftEnsure();
+      logLink();
       const content = await plainContent(info.content);
       T.log("share.sent_plain", {condition:"baseline", url:info.content.sourceUrl});
       saveShare({shareId}, {trigger_kind:"baseline_send", message_text:info.rawNote, link_url:info.content.sourceUrl, outcome:"sent_plain", ...scenarioFields()});
@@ -336,6 +351,7 @@ const widget = (function(){
     if (s && s.ctl) s.ctl.abort();
     closePops();
     const shareId = draftEnsure();
+    logLink();
     Draft.scenarioLocked = !!(Draft.scenario && input.value === Draft.scenarioText);
     s = Object.assign(info, {shareId, intent:null, extraction:null, phase:"intent", error:null, gapAsked:false, gapLogged:false, editing:false,
       regenerations:0, version:0, ctl:null, maxScroll:0, cached:false});
@@ -611,6 +627,7 @@ for (const b of document.querySelectorAll("#viewseg button")) b.addEventListener
 function clearInputs(){ input.value = ""; UI.attachment = null; autoGrow(); draftReset(); }
 
 /* ---------- QR: open B's screen on a phone (CHI booth, plan §11.4) ---------- */
+$("#resetbtn").addEventListener("click", () => { T.log("demo.reset"); T.beacon(); location.href = location.pathname; });
 $("#qrbtn").addEventListener("click", () => {
   const code = PARTNER().code;
   const url = location.origin + (Net.mode === "booth" ? "/booth" : "/demo") + "?code=" + code;
@@ -724,6 +741,7 @@ async function boot(){
   $("#ai-text").textContent = live ? "Live AI: on" : "AI: mock (no API key yet)";
   $("#row-surveys").hidden = UI.study; $("#opt-surveys").checked = UI.surveys;
   $("#row-qr").hidden = UI.single || !window.qrcode;
+  $("#row-reset").hidden = UI.single;
   if (UI.single) $("#studybtn").hidden = true;
 
   CONVS = {R:{key:"R", name:"", sub:"Research chat", av:"R", demo:!UI.single, thread:[], pinned:null}};

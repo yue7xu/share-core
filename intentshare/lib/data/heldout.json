@@ -1,0 +1,365 @@
+{
+ "note": "Held-out messages for the technical evaluation (plan §11.2-A). 'proposed' is the type Claude wrote each message for; it is provisional. Two human coders label every item blind in the console (Coding tab); evaluation uses the human consensus when it exists.",
+ "items": [
+  {
+   "id": "H01",
+   "message": "let's go here friday after class?",
+   "content_ref": "https://maps.example.com/place/noodle-lab",
+   "proposed": "PROPOSE·activity"
+  },
+  {
+   "id": "H02",
+   "message": "要不要这周末一起去看这个",
+   "content_ref": "https://movies.example.com/whalefall",
+   "proposed": "PROPOSE·activity"
+  },
+  {
+   "id": "H03",
+   "message": "we should make this together on sunday",
+   "content_ref": "https://tiktok.example.com/@homecook/video/tomato-egg-noodles",
+   "proposed": "PROPOSE·activity"
+  },
+  {
+   "id": "H04",
+   "message": "这家晚上去吃怎么样，我请",
+   "content_ref": "https://maps.example.com/place/noodle-lab",
+   "proposed": "PROPOSE·activity"
+  },
+  {
+   "id": "H05",
+   "message": "please watch the part about anchoring it to the wall before you start",
+   "content_ref": "https://video.example.com/watch?v=bookcase-5shelf",
+   "proposed": "REQUEST·activity"
+  },
+  {
+   "id": "H06",
+   "message": "你看完这篇就别再熬夜抽烟了",
+   "content_ref": "https://health.example.com/articles/smoking-blood-vessels",
+   "proposed": "REQUEST·activity"
+  },
+  {
+   "id": "H07",
+   "message": "can you sign us up before friday? I'm in class all day",
+   "content_ref": "https://events.example.com/fall-hackathon",
+   "proposed": "REQUEST·activity"
+  },
+  {
+   "id": "H08",
+   "message": "记得把这个流程发给组里每个人",
+   "content_ref": "https://www.youtube.com/watch?v=S-sYlFiGFv8",
+   "proposed": "REQUEST·activity"
+  },
+  {
+   "id": "H09",
+   "message": "thoughts on this? would it work for our lab?",
+   "content_ref": "https://work.example.com/blog/hybrid-vs-remote",
+   "proposed": "REQUEST·opinion"
+  },
+  {
+   "id": "H10",
+   "message": "你觉得这个值不值得排队？",
+   "content_ref": "https://reddit.example.com/r/pittsburgh/comments/noodle_lab_wait",
+   "proposed": "REQUEST·opinion"
+  },
+  {
+   "id": "H11",
+   "message": "is this movie too scary for you?",
+   "content_ref": "https://movies.example.com/whalefall",
+   "proposed": "REQUEST·opinion"
+  },
+  {
+   "id": "H12",
+   "message": "这个书架你觉得放客厅还是卧室",
+   "content_ref": "https://video.example.com/watch?v=bookcase-5shelf",
+   "proposed": "REQUEST·opinion"
+  },
+  {
+   "id": "H13",
+   "message": "you'd love this one, the vanilla makes it",
+   "content_ref": "photo:la-prima-matcha",
+   "proposed": "SUGGEST·activity"
+  },
+  {
+   "id": "H14",
+   "message": "这个做法超简单 你可以试试",
+   "content_ref": "https://tiktok.example.com/@homecook/video/tomato-egg-noodles",
+   "proposed": "SUGGEST·activity"
+  },
+  {
+   "id": "H15",
+   "message": "highly recommend if you're stuck at your desk all day",
+   "content_ref": "https://video.example.com/watch?v=desk-stretch",
+   "proposed": "SUGGEST·activity"
+  },
+  {
+   "id": "H16",
+   "message": "这本书推荐给你 期末前看正好",
+   "content_ref": "https://books.example.com/make-it-stick",
+   "proposed": "SUGGEST·activity"
+  },
+  {
+   "id": "H17",
+   "message": "I'll bring my drill on saturday and we can do this",
+   "content_ref": "https://video.example.com/watch?v=bookcase-5shelf",
+   "proposed": "COMMIT·activity"
+  },
+  {
+   "id": "H18",
+   "message": "这个我来报名，你不用管了",
+   "content_ref": "https://events.example.com/fall-hackathon",
+   "proposed": "COMMIT·activity"
+  },
+  {
+   "id": "H19",
+   "message": "I'll cook this for you tonight",
+   "content_ref": "https://tiktok.example.com/@homecook/video/tomato-egg-noodles",
+   "proposed": "COMMIT·activity"
+  },
+  {
+   "id": "H20",
+   "message": "周五之前我把议程改好发你",
+   "content_ref": "https://docs.example.com/offsite-agenda-v2",
+   "proposed": "COMMIT·activity"
+  },
+  {
+   "id": "H21",
+   "message": "gonna skip this one, 2 hour wait is too much",
+   "content_ref": "https://reddit.example.com/r/pittsburgh/comments/noodle_lab_wait",
+   "proposed": "REFUSE·activity"
+  },
+  {
+   "id": "H22",
+   "message": "这个电影我就不去了 太吓人",
+   "content_ref": "https://movies.example.com/whalefall",
+   "proposed": "REFUSE·activity"
+  },
+  {
+   "id": "H23",
+   "message": "can't make the hackathon this year, too much going on",
+   "content_ref": "https://events.example.com/fall-hackathon",
+   "proposed": "REFUSE·activity"
+  },
+  {
+   "id": "H24",
+   "message": "这个协作方式我们组用不了，人太少",
+   "content_ref": "https://www.youtube.com/watch?v=S-sYlFiGFv8",
+   "proposed": "REFUSE·activity"
+  },
+  {
+   "id": "H25",
+   "message": "fyi the hours changed, closed tuesdays now",
+   "content_ref": "https://maps.example.com/place/noodle-lab",
+   "proposed": "DELIVER·information"
+  },
+  {
+   "id": "H26",
+   "message": "新的 OPT 规定在这",
+   "content_ref": "https://reddit.example.com/r/f1visa/comments/opt_changes_915",
+   "proposed": "DELIVER·information"
+  },
+  {
+   "id": "H27",
+   "message": "this has the showtimes for this week",
+   "content_ref": "https://movies.example.com/whalefall",
+   "proposed": "DELIVER·information"
+  },
+  {
+   "id": "H28",
+   "message": "报名步骤在这里",
+   "content_ref": "https://events.example.com/fall-hackathon",
+   "proposed": "DELIVER·information"
+  },
+  {
+   "id": "H29",
+   "message": "honestly this is the best take on remote work I've read",
+   "content_ref": "https://work.example.com/blog/hybrid-vs-remote",
+   "proposed": "DELIVER·opinion"
+  },
+  {
+   "id": "H30",
+   "message": "我同意第三条，一个决定一个负责人",
+   "content_ref": "https://www.youtube.com/watch?v=S-sYlFiGFv8",
+   "proposed": "DELIVER·opinion"
+  },
+  {
+   "id": "H31",
+   "message": "this article is right about cutting down first",
+   "content_ref": "https://health.example.com/articles/smoking-blood-vessels",
+   "proposed": "DELIVER·opinion"
+  },
+  {
+   "id": "H32",
+   "message": "这个帖子说得有道理，周末去确实不值",
+   "content_ref": "https://reddit.example.com/r/pittsburgh/comments/noodle_lab_wait",
+   "proposed": "DELIVER·opinion"
+  },
+  {
+   "id": "H33",
+   "message": "reminder: registration closes friday night",
+   "content_ref": "https://events.example.com/fall-hackathon",
+   "proposed": "REMIND·information"
+  },
+  {
+   "id": "H34",
+   "message": "别忘了周六十点开始，不是九点",
+   "content_ref": "https://docs.example.com/offsite-agenda-v2",
+   "proposed": "REMIND·information"
+  },
+  {
+   "id": "H35",
+   "message": "don't forget we said we'd fix the shelf this weekend",
+   "content_ref": "https://video.example.com/watch?v=bookcase-5shelf",
+   "proposed": "REMIND·information"
+  },
+  {
+   "id": "H36",
+   "message": "提醒一下 电影是周五晚上那场",
+   "content_ref": "https://movies.example.com/whalefall",
+   "proposed": "REMIND·information"
+  },
+  {
+   "id": "H37",
+   "message": "oops wrong link, this is the updated agenda",
+   "content_ref": "https://docs.example.com/offsite-agenda-v2",
+   "proposed": "AMEND·information"
+  },
+  {
+   "id": "H38",
+   "message": "更正一下，是这个新版本",
+   "content_ref": "https://docs.example.com/offsite-agenda-v2",
+   "proposed": "AMEND·information"
+  },
+  {
+   "id": "H39",
+   "message": "ignore the last one, this is the right video",
+   "content_ref": "https://www.youtube.com/watch?v=S-sYlFiGFv8",
+   "proposed": "AMEND·information"
+  },
+  {
+   "id": "H40",
+   "message": "刚才那个发错了 看这个",
+   "content_ref": "https://work.example.com/blog/hybrid-vs-remote",
+   "proposed": "AMEND·information"
+  },
+  {
+   "id": "H41",
+   "message": "😂😂😂",
+   "content_ref": "https://video.example.com/watch?v=frisbee-fails&t=74",
+   "proposed": "EXPRESS·reaction"
+  },
+  {
+   "id": "H42",
+   "message": "哈哈哈哈这个柯基",
+   "content_ref": "https://video.example.com/watch?v=frisbee-fails&t=74",
+   "proposed": "EXPRESS·reaction"
+  },
+  {
+   "id": "H43",
+   "message": "omg the pool jump",
+   "content_ref": "https://video.example.com/watch?v=frisbee-fails&t=74",
+   "proposed": "EXPRESS·reaction"
+  },
+  {
+   "id": "H44",
+   "message": "笑死",
+   "content_ref": "https://video.example.com/watch?v=frisbee-fails&t=74",
+   "proposed": "EXPRESS·reaction"
+  },
+  {
+   "id": "H45",
+   "message": "thank you for sending me this last week, it really helped",
+   "content_ref": "https://books.example.com/make-it-stick",
+   "proposed": "EXPRESS·attitude"
+  },
+  {
+   "id": "H46",
+   "message": "抱歉上次没跟你去，这次补上",
+   "content_ref": "https://maps.example.com/place/noodle-lab",
+   "proposed": "EXPRESS·attitude"
+  },
+  {
+   "id": "H47",
+   "message": "congrats on finishing the shelf!!",
+   "content_ref": "https://video.example.com/watch?v=bookcase-5shelf",
+   "proposed": "EXPRESS·attitude"
+  },
+  {
+   "id": "H48",
+   "message": "谢谢你推荐这个拉伸，脖子好多了",
+   "content_ref": "https://video.example.com/watch?v=desk-stretch",
+   "proposed": "EXPRESS·attitude"
+  },
+  {
+   "id": "H49",
+   "message": "happy birthday!! 🎉",
+   "content_ref": "https://music.example.com/track/happy-birthday-jazz",
+   "proposed": "GREET"
+  },
+  {
+   "id": "H50",
+   "message": "新年快乐 这首给你",
+   "content_ref": "https://music.example.com/track/open-highway",
+   "proposed": "GREET"
+  },
+  {
+   "id": "H51",
+   "message": "good morning ☀️ start the day with this",
+   "content_ref": "https://video.example.com/watch?v=desk-stretch",
+   "proposed": "GREET"
+  },
+  {
+   "id": "H52",
+   "message": "生日快乐呀",
+   "content_ref": "https://music.example.com/track/happy-birthday-jazz",
+   "proposed": "GREET"
+  },
+  {
+   "id": "H53",
+   "message": "okay it's official, this is our playlist opener",
+   "content_ref": "https://music.example.com/track/open-highway",
+   "proposed": "DECLARE"
+  },
+  {
+   "id": "H54",
+   "message": "就这么定了，以后每周一个 anchor day",
+   "content_ref": "https://work.example.com/blog/hybrid-vs-remote",
+   "proposed": "DECLARE"
+  },
+  {
+   "id": "H55",
+   "message": "from now on this is our friday dinner spot",
+   "content_ref": "https://maps.example.com/place/noodle-lab",
+   "proposed": "DECLARE"
+  },
+  {
+   "id": "H56",
+   "message": "这本就定为我们读书会的第一本",
+   "content_ref": "https://books.example.com/make-it-stick",
+   "proposed": "DECLARE"
+  },
+  {
+   "id": "H57",
+   "message": "",
+   "content_ref": "https://video.example.com/watch?v=desk-stretch",
+   "proposed": "OTHER"
+  },
+  {
+   "id": "H58",
+   "message": "",
+   "content_ref": "https://books.example.com/make-it-stick",
+   "proposed": "OTHER"
+  },
+  {
+   "id": "H59",
+   "message": "hm",
+   "content_ref": "https://music.example.com/track/open-highway",
+   "proposed": "OTHER"
+  },
+  {
+   "id": "H60",
+   "message": "…",
+   "content_ref": "https://docs.example.com/offsite-agenda-v2",
+   "proposed": "OTHER"
+  }
+ ]
+}
