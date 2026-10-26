@@ -1,0 +1,175 @@
+{
+ "types": {
+  "PROPOSE·activity": {
+   "cls": "directive",
+   "src": "Cohen: Propose",
+   "label": "Proposing a plan",
+   "def": "do something together with the sender",
+   "cues": "first-person plural incl. both + activity verb + future/time (我们去, 要不要一起, let's)",
+   "action": "time_options",
+   "guide": "Info useful for doing it together: place, duration, options. Keep it practical."
+  },
+  "REQUEST·activity": {
+   "cls": "directive",
+   "src": "Cohen: Request; Searle: advice",
+   "label": "Asking you to do something",
+   "def": "do or change something as the sender asks (request, advice)",
+   "cues": "second person + imperative/advice (你…吧, 记得, 少…, you should)",
+   "action": "reply_options",
+   "guide": "What the sender asks + the evidence in the content that backs it."
+  },
+  "REQUEST·opinion": {
+   "cls": "directive",
+   "src": "Cohen: Request (information)",
+   "label": "Asking your opinion",
+   "def": "give the sender an opinion or answer",
+   "cues": "question, opinion-seeking verbs (你觉得, 怎么样, thoughts?)",
+   "action": "quick_replies",
+   "guide": "The point the sender wants an opinion on + where the content discusses it."
+  },
+  "SUGGEST·activity": {
+   "cls": "directive",
+   "src": "Searle & Vanderveken: suggest",
+   "label": "Suggesting you try",
+   "def": "try something on their own; free to ignore",
+   "cues": "evaluative words implying 'you'd like it' (蛮好喝的, 推荐, so good)",
+   "action": "save_for_later",
+   "guide": "How to try it: what to order, where."
+  },
+  "COMMIT·activity": {
+   "cls": "commissive",
+   "src": "Cohen: Commit",
+   "label": "Offering to do it",
+   "def": "know the sender commits to doing something",
+   "cues": "first-person singular + future + action for the receiver (我帮你, 我来, I'll)",
+   "action": "add_to_calendar",
+   "guide": "What the sender will do and roughly how long it takes."
+  },
+  "REFUSE·activity": {
+   "cls": "commissive",
+   "src": "Cohen: Refuse",
+   "label": "Declining",
+   "def": "know the sender declines something, and why",
+   "cues": "negation of a proposal (不去了, 算了, can't make it)",
+   "action": "alternatives",
+   "guide": "Where in the content the reason for declining is."
+  },
+  "DELIVER·information": {
+   "cls": "assertive",
+   "src": "Cohen: Deliver (data)",
+   "label": "FYI",
+   "def": "know a piece of information",
+   "cues": "neutral statement, no request or stance (看到这个, fyi)",
+   "action": "save",
+   "guide": "The specific facts that matter."
+  },
+  "DELIVER·opinion": {
+   "cls": "assertive",
+   "src": "Cohen: Deliver (opinion)",
+   "label": "Sharing a view",
+   "def": "know the sender's view on the content",
+   "cues": "stance on the content (说得对, 我同意, agree)",
+   "action": "discuss_prompt",
+   "guide": "Which arguments the sender agrees with and where they are."
+  },
+  "REMIND·information": {
+   "cls": "assertive",
+   "src": "Cohen: Remind",
+   "label": "Reminder",
+   "def": "recall something both already know",
+   "cues": "reminder words + deadline (提醒一下, 别忘了, 截止)",
+   "action": "set_reminder",
+   "guide": "The deadline and what to do."
+  },
+  "AMEND·information": {
+   "cls": "assertive",
+   "src": "Cohen: Amend",
+   "label": "Correction",
+   "def": "replace something sent earlier",
+   "cues": "correction words (发错了, 更正, 新版本, ignore the last one)",
+   "action": "replace_previous",
+   "guide": "What changed compared with the earlier version."
+  },
+  "EXPRESS·reaction": {
+   "cls": "expressive",
+   "src": "Searle: expressive",
+   "label": "Sharing a moment",
+   "def": "feel the sender's reaction (funny, moving)",
+   "cues": "exclamation, laughter, emoji only (哈哈, lol, 😭)",
+   "action": "none",
+   "guide": "At most 12 words naming the moment."
+  },
+  "EXPRESS·attitude": {
+   "cls": "expressive",
+   "src": "Searle: thank / apologize / congratulate",
+   "label": "Saying thanks",
+   "def": "receive thanks, an apology or congratulations",
+   "cues": "thank/sorry/congrats verbs (谢谢, 抱歉, 恭喜)",
+   "action": "none",
+   "guide": "At most 12 words."
+  },
+  "GREET": {
+   "cls": "expressive",
+   "src": "Cohen: Greet",
+   "label": "Greeting",
+   "def": "receive a greeting or holiday wish",
+   "cues": "greeting formulas (生日快乐, 新年快乐, happy birthday)",
+   "action": "none",
+   "guide": "No summary: return an empty string."
+  },
+  "DECLARE": {
+   "cls": "declaration",
+   "src": "Searle: declaration",
+   "label": "Making it official",
+   "def": "know something is now settled",
+   "cues": "status-setting performative (就定为, 从今天起, officially)",
+   "action": "pin",
+   "guide": "At most 12 words: what is now settled."
+  },
+  "OTHER": {
+   "cls": "none",
+   "src": "Cohen: Other",
+   "label": "Shared a link",
+   "def": "unclear; ask the sender",
+   "cues": "no words, or no cue",
+   "action": "clarify",
+   "guide": "One overall sentence about the content."
+  }
+ },
+ "order": [
+  "PROPOSE·activity",
+  "REQUEST·activity",
+  "REQUEST·opinion",
+  "SUGGEST·activity",
+  "COMMIT·activity",
+  "REFUSE·activity",
+  "DELIVER·information",
+  "DELIVER·opinion",
+  "REMIND·information",
+  "AMEND·information",
+  "EXPRESS·reaction",
+  "EXPRESS·attitude",
+  "GREET",
+  "DECLARE",
+  "OTHER"
+ ],
+ "required": {
+  "PROPOSE·activity": [
+   "what",
+   "when"
+  ],
+  "REQUEST·activity": [
+   "what"
+  ],
+  "REQUEST·opinion": [
+   "what"
+  ],
+  "COMMIT·activity": [
+   "what",
+   "when"
+  ],
+  "REMIND·information": [
+   "when"
+  ]
+ }
+}

@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>IntentShare Messages</title>
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="/app/styles.css">
+</head>
+<body>
+<div class="win">
+  <aside class="side">
+    <div class="side-top">
+      <div class="side-title"><b>Messages</b></div>
+      <input class="search" id="search" placeholder="Search" aria-label="Search conversations">
+    </div>
+    <nav class="convs" id="convs" aria-label="Conversations"></nav>
+    <div class="side-foot"><span class="dot" id="ai-dot"></span><span id="ai-text">Live AI: connecting…</span></div>
+  </aside>
+
+  <section class="main">
+    <header class="top">
+      <div class="spacer"></div>
+      <div class="who"><div class="av avs" id="top-av">B</div><b id="top-name">B</b><span id="top-sub">Research chat</span></div>
+      <div class="seg" id="viewseg" role="group" aria-label="Whose screen">
+        <button id="v-a" data-v="A" aria-pressed="true">A's screen</button>
+        <button id="v-b" data-v="B" aria-pressed="false">B's screen</button>
+      </div>
+      <button class="ico" id="studybtn" aria-label="Study settings" aria-expanded="false">⋯</button>
+    </header>
+    <div class="pin" id="pin" hidden></div>
+    <div class="thread" id="thread" aria-live="polite"></div>
+
+    <div class="comp" id="comp">
+      <div id="survey-slot"></div>
+      <div id="widget-slot"></div>
+      <div class="bar">
+        <button class="plus" id="plusbtn" aria-label="Add photo or sample share" aria-expanded="false">+</button>
+        <div class="field">
+          <div id="attslot"></div>
+          <div class="line">
+            <textarea id="input" rows="1" placeholder="Message" aria-label="Message"></textarea>
+            <button class="send" id="send" aria-label="Send" disabled>↑</button>
+          </div>
+        </div>
+      </div>
+      <div class="pop" id="plusmenu" hidden></div>
+    </div>
+    <div class="pop" id="studymenu" hidden>
+      <div class="ph">Study condition</div>
+      <div class="opt-row"><span>Share cards (AI)</span><input type="radio" name="cond" id="cond-ai" value="ai" checked></div>
+      <div class="opt-row"><span>Plain links (baseline)</span><input type="radio" name="cond" id="cond-base" value="baseline"></div>
+      <hr>
+      <div class="ph">Model</div>
+      <div class="opt-row"><span>Quick</span><input type="radio" name="tier" id="tier-q" value="quick" checked></div>
+      <div class="opt-row"><span>Default (slower)</span><input type="radio" name="tier" id="tier-d" value="default"></div>
+      <hr>
+      <div class="opt-row" id="row-surveys"><span>Show study questions</span><input type="checkbox" id="opt-surveys"></div>
+      <div class="opt-row" id="row-qr"><span>Open B on a phone</span><button class="link" type="button" id="qrbtn">Show QR</button></div>
+      <hr>
+      <div class="pn" id="evcount">0 events logged this session</div>
+      <div class="pn" id="mode-note"></div>
+    </div>
+  </section>
+</div>
+
+<div class="gate" id="gate" role="dialog" aria-modal="true" aria-labelledby="gate-title">
+  <div class="card">
+    <h1 id="gate-title">Loading…</h1>
+    <div id="gate-body"></div>
+  </div>
+</div>
+
+<script src="/app/vendor/qrcode.js"></script>
+<script src="/app/net.js"></script>
+<script src="/app/core.js"></script>
+<script src="/app/ui.js"></script>
+</body>
+</html>

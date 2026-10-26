@@ -1,0 +1,808 @@
+{
+ "content": {
+  "https://maps.example.com/place/noodle-lab": {
+   "isMock": true,
+   "metadata": {
+    "duration": "~1.5 h"
+   },
+   "id": "noodle-lab",
+   "kind": "place",
+   "sourceUrl": "https://maps.example.com/place/noodle-lab",
+   "title": "Noodle Lab · Squirrel Hill",
+   "units": [
+    {
+     "unitId": "u1",
+     "text": "Address: 5801 Forbes Ave, Squirrel Hill. About 15 min by bus from both of you.",
+     "itemType": "info"
+    },
+    {
+     "unitId": "u2",
+     "text": "Most recommended: dan dan noodles, mentioned in most reviews.",
+     "itemType": "menu"
+    },
+    {
+     "unitId": "u3",
+     "text": "Also popular: chili oil wontons. There is a vegetarian noodle option.",
+     "itemType": "menu"
+    },
+    {
+     "unitId": "u4",
+     "text": "Hours: 11:30–21:30, closed Tuesdays.",
+     "itemType": "info"
+    },
+    {
+     "unitId": "u5",
+     "text": "Weekend dinner waits are often 30–60 min; weekday lunch usually has no wait.",
+     "itemType": "info"
+    },
+    {
+     "unitId": "u6",
+     "text": "Parking: street parking only.",
+     "itemType": "info"
+    }
+   ]
+  },
+  "https://movies.example.com/whalefall": {
+   "isMock": true,
+   "metadata": {
+    "duration": "1 h 52 min",
+    "showtimes": [
+     {
+      "label": "Wed Oct 28 · 7:10 pm",
+      "a": true,
+      "b": false
+     },
+     {
+      "label": "Fri Oct 30 · 9:40 pm",
+      "a": true,
+      "b": true
+     },
+     {
+      "label": "Sat Oct 31 · 1:30 pm",
+      "a": true,
+      "b": true
+     },
+     {
+      "label": "Sat Oct 31 · 4:15 pm",
+      "a": false,
+      "b": true
+     }
+    ]
+   },
+   "id": "whalefall",
+   "kind": "event",
+   "sourceUrl": "https://movies.example.com/whalefall",
+   "title": "Whalefall · AMC Waterfront listing",
+   "units": [
+    {
+     "unitId": "u1",
+     "text": "Synopsis: a young diver is swallowed by a sperm whale while searching for his father's remains, and has one hour of air to get out.",
+     "itemType": "info"
+    },
+    {
+     "unitId": "u2",
+     "text": "Runtime 1 h 52 min. Rated PG-13.",
+     "itemType": "info"
+    },
+    {
+     "unitId": "u3",
+     "text": "Trailer, 2 min 10 s, on the listing page.",
+     "itemType": "trailer"
+    },
+    {
+     "unitId": "u4",
+     "text": "Showtimes this week at AMC Waterfront: Wed 7:10 pm, Fri 9:40 pm, Sat 1:30 pm, Sat 4:15 pm.",
+     "itemType": "showtime"
+    },
+    {
+     "unitId": "u5",
+     "text": "Reviews single out the underwater sound design.",
+     "itemType": "info"
+    }
+   ]
+  },
+  "https://tiktok.example.com/@homecook/video/tomato-egg-noodles": {
+   "isMock": true,
+   "metadata": {
+    "duration": "cook 15 min + eat ~30 min"
+   },
+   "id": "tomato-egg",
+   "kind": "video",
+   "sourceUrl": "https://tiktok.example.com/@homecook/video/tomato-egg-noodles",
+   "title": "Tomato egg noodles in 15 minutes",
+   "durationSec": 58,
+   "units": [
+    {
+     "unitId": "u1",
+     "start": 0,
+     "end": 6,
+     "text": "The 15-minute dinner I make every week."
+    },
+    {
+     "unitId": "u2",
+     "start": 6,
+     "end": 18,
+     "text": "Ingredients: 2 eggs, 2 tomatoes, noodles, scallion, soy sauce, a pinch of sugar, salt."
+    },
+    {
+     "unitId": "u3",
+     "start": 18,
+     "end": 32,
+     "text": "Scramble the eggs first and take them out, then cook the tomatoes until saucy."
+    },
+    {
+     "unitId": "u4",
+     "start": 32,
+     "end": 46,
+     "text": "Add the eggs back, season, and pour it over boiled noodles."
+    },
+    {
+     "unitId": "u5",
+     "start": 46,
+     "end": 58,
+     "text": "Prep 5 minutes, cook 10. Serves two. Follow for more."
+    }
+   ]
+  },
+  "https://health.example.com/articles/smoking-blood-vessels": {
+   "isMock": true,
+   "metadata": {},
+   "id": "smoking",
+   "kind": "article",
+   "sourceUrl": "https://health.example.com/articles/smoking-blood-vessels",
+   "title": "What smoking does to your blood vessels",
+   "units": [
+    {
+     "unitId": "p1",
+     "paragraphIndex": 1,
+     "text": "Smoking damages the inner lining of blood vessels and makes them stiffer over time."
+    },
+    {
+     "unitId": "p2",
+     "paragraphIndex": 2,
+     "text": "(Fictional figure for demo) In the cited study, non-smokers had XX% fewer ruptured blood vessels than smokers."
+    },
+    {
+     "unitId": "p3",
+     "paragraphIndex": 3,
+     "text": "Cutting down helps even before quitting completely; risk starts to fall within weeks."
+    },
+    {
+     "unitId": "p4",
+     "paragraphIndex": 4,
+     "text": "Practical tips: replace cigarette breaks with a short walk, and tell a friend your goal."
+    },
+    {
+     "unitId": "p5",
+     "paragraphIndex": 5,
+     "text": "A short history of tobacco advertising in the 1950s."
+    }
+   ]
+  },
+  "https://work.example.com/blog/hybrid-vs-remote": {
+   "isMock": true,
+   "metadata": {},
+   "id": "hybrid",
+   "kind": "article",
+   "sourceUrl": "https://work.example.com/blog/hybrid-vs-remote",
+   "title": "Hybrid vs. remote: what small teams learned",
+   "units": [
+    {
+     "unitId": "p1",
+     "paragraphIndex": 1,
+     "text": "Fully remote teams reported more focus time and fewer interruptions."
+    },
+    {
+     "unitId": "p2",
+     "paragraphIndex": 2,
+     "text": "Hybrid teams said in-person days helped onboarding and fast decisions."
+    },
+    {
+     "unitId": "p3",
+     "paragraphIndex": 3,
+     "text": "For teams under 10 people, the deciding factor was time-zone overlap, not office space."
+    },
+    {
+     "unitId": "p4",
+     "paragraphIndex": 4,
+     "text": "Our office redesign: new standing desks and more plants."
+    },
+    {
+     "unitId": "p5",
+     "paragraphIndex": 5,
+     "text": "Recommendation: one anchor day a week if most people live nearby; otherwise go remote with written decisions."
+    }
+   ]
+  },
+  "photo:la-prima-matcha": {
+   "isMock": true,
+   "metadata": {
+    "place": "La Prima Espresso, Strip District"
+   },
+   "id": "matcha",
+   "kind": "image",
+   "sourceUrl": "photo:la-prima-matcha",
+   "title": "Photo · iced matcha latte",
+   "units": [
+    {
+     "unitId": "i1",
+     "text": "An iced matcha latte in a La Prima Espresso cup.",
+     "itemType": "photo"
+    },
+    {
+     "unitId": "i2",
+     "text": "Cup label reads 'matcha · vanilla'.",
+     "itemType": "photo"
+    },
+    {
+     "unitId": "i3",
+     "text": "Location tag: La Prima Espresso, 21st St, Strip District.",
+     "itemType": "place"
+    },
+    {
+     "unitId": "i4",
+     "text": "Background: menu board and pastry case.",
+     "itemType": "photo"
+    }
+   ]
+  },
+  "https://video.example.com/watch?v=bookcase-5shelf": {
+   "isMock": true,
+   "metadata": {
+    "duration": "~90 min for two people"
+   },
+   "id": "bookcase",
+   "kind": "video",
+   "sourceUrl": "https://video.example.com/watch?v=bookcase-5shelf",
+   "title": "How to assemble a 5-shelf bookcase",
+   "durationSec": 540,
+   "units": [
+    {
+     "unitId": "u1",
+     "start": 0,
+     "end": 40,
+     "text": "Intro and a sponsor message."
+    },
+    {
+     "unitId": "u2",
+     "start": 40,
+     "end": 95,
+     "text": "Tools: a Phillips screwdriver, a hammer, and ideally a second person."
+    },
+    {
+     "unitId": "u3",
+     "start": 95,
+     "end": 260,
+     "text": "Steps 1–4: attach the side panels, insert shelf pins, add the fixed shelves."
+    },
+    {
+     "unitId": "u4",
+     "start": 260,
+     "end": 400,
+     "text": "Steps 5–7: nail on the back panel and check that it's square."
+    },
+    {
+     "unitId": "u5",
+     "start": 400,
+     "end": 480,
+     "text": "Anchor it to the wall with the included strap."
+    },
+    {
+     "unitId": "u6",
+     "start": 480,
+     "end": 540,
+     "text": "Total time: about 90 minutes for two people."
+    }
+   ]
+  },
+  "https://reddit.example.com/r/pittsburgh/comments/noodle_lab_wait": {
+   "isMock": true,
+   "metadata": {},
+   "id": "noodle-wait",
+   "kind": "thread",
+   "sourceUrl": "https://reddit.example.com/r/pittsburgh/comments/noodle_lab_wait",
+   "title": "Is Noodle Lab worth the weekend wait?",
+   "units": [
+    {
+     "unitId": "c1",
+     "paragraphIndex": 1,
+     "text": "OP: Planning to go Saturday. How bad is the line?"
+    },
+    {
+     "unitId": "c2",
+     "paragraphIndex": 2,
+     "text": "We waited almost 2 hours last Saturday at 7 pm."
+    },
+    {
+     "unitId": "c3",
+     "paragraphIndex": 3,
+     "text": "Weekday lunch: walked right in."
+    },
+    {
+     "unitId": "c4",
+     "paragraphIndex": 4,
+     "text": "The dan dan noodles are great, but not two-hours great."
+    },
+    {
+     "unitId": "c5",
+     "paragraphIndex": 5,
+     "text": "Unrelated, but parking on Murray Ave is a nightmare."
+    }
+   ]
+  },
+  "https://reddit.example.com/r/f1visa/comments/opt_changes_915": {
+   "isMock": true,
+   "metadata": {},
+   "id": "opt",
+   "kind": "thread",
+   "sourceUrl": "https://reddit.example.com/r/f1visa/comments/opt_changes_915",
+   "title": "OPT changes effective 9/15 — megathread (fictional details)",
+   "units": [
+    {
+     "unitId": "c1",
+     "paragraphIndex": 1,
+     "text": "(Fictional) Starting 9/15, employment updates go through a new online portal instead of email."
+    },
+    {
+     "unitId": "c2",
+     "paragraphIndex": 2,
+     "text": "(Fictional) The reporting window is now 10 days instead of 14."
+    },
+    {
+     "unitId": "c3",
+     "paragraphIndex": 3,
+     "text": "(Fictional) Applications filed before 9/15 follow the old process."
+    },
+    {
+     "unitId": "c4",
+     "paragraphIndex": 4,
+     "text": "Ask your school's international office to confirm before acting."
+    },
+    {
+     "unitId": "c5",
+     "paragraphIndex": 5,
+     "text": "Off-topic: meme thread link."
+    }
+   ]
+  },
+  "https://www.youtube.com/watch?v=S-sYlFiGFv8": {
+   "isMock": true,
+   "metadata": {},
+   "id": "collab",
+   "kind": "video",
+   "sourceUrl": "https://www.youtube.com/watch?v=S-sYlFiGFv8",
+   "title": "Shared YouTube video (placeholder transcript)",
+   "durationSec": 1080,
+   "units": [
+    {
+     "unitId": "u1",
+     "start": 0,
+     "end": 60,
+     "text": "Intro: why most teams waste time in meetings."
+    },
+    {
+     "unitId": "u2",
+     "start": 60,
+     "end": 240,
+     "text": "Principle 1: write the decision down before the meeting, not after."
+    },
+    {
+     "unitId": "u3",
+     "start": 240,
+     "end": 420,
+     "text": "Principle 2: default to async updates; meet only to decide."
+    },
+    {
+     "unitId": "u4",
+     "start": 420,
+     "end": 600,
+     "text": "Sponsor segment."
+    },
+    {
+     "unitId": "u5",
+     "start": 600,
+     "end": 840,
+     "text": "Principle 3: one owner per decision; everyone else advises."
+    },
+    {
+     "unitId": "u6",
+     "start": 840,
+     "end": 1080,
+     "text": "Recap, and how to start next week."
+    }
+   ]
+  },
+  "https://events.example.com/fall-hackathon": {
+   "isMock": true,
+   "metadata": {
+    "deadline": "Fri Oct 30 · 11:59 pm",
+    "remind": "Thu Oct 29 · 6:00 pm"
+   },
+   "id": "hackathon",
+   "kind": "event",
+   "sourceUrl": "https://events.example.com/fall-hackathon",
+   "title": "Fall Hackathon 2026 · registration",
+   "units": [
+    {
+     "unitId": "e1",
+     "text": "Registration closes Friday, Oct 30 at 11:59 pm.",
+     "itemType": "deadline"
+    },
+    {
+     "unitId": "e2",
+     "text": "Teams of 2–4; solo sign-ups get matched.",
+     "itemType": "info"
+    },
+    {
+     "unitId": "e3",
+     "text": "Steps: fill in the form, add a one-line idea, confirm by email.",
+     "itemType": "steps"
+    },
+    {
+     "unitId": "e4",
+     "text": "Event dates: Nov 14–15.",
+     "itemType": "info"
+    },
+    {
+     "unitId": "e5",
+     "text": "Gallery of past winners.",
+     "itemType": "info"
+    }
+   ]
+  },
+  "https://docs.example.com/offsite-agenda-v2": {
+   "isMock": true,
+   "metadata": {
+    "previousTitle": "Team offsite agenda · v1"
+   },
+   "id": "agenda2",
+   "kind": "article",
+   "sourceUrl": "https://docs.example.com/offsite-agenda-v2",
+   "title": "Team offsite agenda · v2",
+   "units": [
+    {
+     "unitId": "p1",
+     "paragraphIndex": 1,
+     "text": "Start time moved to 10:00 (was 9:00)."
+    },
+    {
+     "unitId": "p2",
+     "paragraphIndex": 2,
+     "text": "Location changed to room 4401 (was the lounge)."
+    },
+    {
+     "unitId": "p3",
+     "paragraphIndex": 3,
+     "text": "Lunch at 12:30, unchanged."
+    },
+    {
+     "unitId": "p4",
+     "paragraphIndex": 4,
+     "text": "Afternoon: project demos, 2:00–4:00."
+    }
+   ]
+  },
+  "https://docs.example.com/offsite-agenda-v1": {
+   "isMock": true,
+   "metadata": {},
+   "id": "agenda1",
+   "kind": "article",
+   "sourceUrl": "https://docs.example.com/offsite-agenda-v1",
+   "title": "Team offsite agenda · v1",
+   "units": [
+    {
+     "unitId": "p1",
+     "paragraphIndex": 1,
+     "text": "Start at 9:00 in the lounge."
+    },
+    {
+     "unitId": "p2",
+     "paragraphIndex": 2,
+     "text": "Lunch at 12:30."
+    },
+    {
+     "unitId": "p3",
+     "paragraphIndex": 3,
+     "text": "Afternoon: project demos."
+    }
+   ]
+  },
+  "https://video.example.com/watch?v=frisbee-fails&t=74": {
+   "isMock": true,
+   "metadata": {},
+   "id": "frisbee",
+   "kind": "video",
+   "sourceUrl": "https://video.example.com/watch?v=frisbee-fails&t=74",
+   "title": "Dogs vs. frisbees: 5 minutes of fails",
+   "durationSec": 300,
+   "units": [
+    {
+     "unitId": "u1",
+     "start": 0,
+     "end": 30,
+     "text": "Intro montage."
+    },
+    {
+     "unitId": "u2",
+     "start": 30,
+     "end": 62,
+     "text": "A golden retriever overshoots the frisbee."
+    },
+    {
+     "unitId": "u3",
+     "start": 62,
+     "end": 88,
+     "text": "A corgi catches it, then falls into the pool."
+    },
+    {
+     "unitId": "u4",
+     "start": 88,
+     "end": 120,
+     "text": "Slow-motion replay of the pool jump."
+    },
+    {
+     "unitId": "u5",
+     "start": 120,
+     "end": 300,
+     "text": "More clips and the outro."
+    }
+   ]
+  },
+  "https://books.example.com/make-it-stick": {
+   "isMock": true,
+   "metadata": {},
+   "id": "book",
+   "kind": "article",
+   "sourceUrl": "https://books.example.com/make-it-stick",
+   "title": "Make It Stick (Brown, Roediger & McDaniel, 2014)",
+   "units": [
+    {
+     "unitId": "b1",
+     "paragraphIndex": 1,
+     "text": "Core idea: retrieving what you learned works better than rereading it."
+    },
+    {
+     "unitId": "b2",
+     "paragraphIndex": 2,
+     "text": "Spacing and mixing practice feel harder but last longer."
+    },
+    {
+     "unitId": "b3",
+     "paragraphIndex": 3,
+     "text": "Struggling with a problem before seeing the answer improves learning."
+    },
+    {
+     "unitId": "b4",
+     "paragraphIndex": 4,
+     "text": "Publisher information and editions."
+    }
+   ]
+  },
+  "https://music.example.com/track/happy-birthday-jazz": {
+   "isMock": true,
+   "metadata": {},
+   "id": "bday",
+   "kind": "video",
+   "sourceUrl": "https://music.example.com/track/happy-birthday-jazz",
+   "title": "Happy Birthday · jazz piano",
+   "durationSec": 150,
+   "units": [
+    {
+     "unitId": "u1",
+     "start": 0,
+     "end": 150,
+     "text": "A jazz piano arrangement of Happy Birthday."
+    }
+   ]
+  },
+  "https://music.example.com/track/open-highway": {
+   "isMock": true,
+   "metadata": {},
+   "id": "road",
+   "kind": "video",
+   "sourceUrl": "https://music.example.com/track/open-highway",
+   "title": "Open Highway · The Mock Band",
+   "durationSec": 220,
+   "units": [
+    {
+     "unitId": "u1",
+     "start": 0,
+     "end": 40,
+     "text": "Upbeat guitar intro."
+    },
+    {
+     "unitId": "u2",
+     "start": 40,
+     "end": 120,
+     "text": "Verse about leaving the city at dawn."
+    },
+    {
+     "unitId": "u3",
+     "start": 120,
+     "end": 220,
+     "text": "Chorus: windows down, nowhere to be."
+    }
+   ]
+  },
+  "https://video.example.com/watch?v=desk-stretch": {
+   "isMock": true,
+   "metadata": {},
+   "id": "stretch",
+   "kind": "video",
+   "sourceUrl": "https://video.example.com/watch?v=desk-stretch",
+   "title": "10-minute desk stretch routine",
+   "durationSec": 600,
+   "units": [
+    {
+     "unitId": "u1",
+     "start": 0,
+     "end": 120,
+     "text": "Neck rolls and side stretches."
+    },
+    {
+     "unitId": "u2",
+     "start": 120,
+     "end": 300,
+     "text": "Shoulder openers."
+    },
+    {
+     "unitId": "u3",
+     "start": 300,
+     "end": 480,
+     "text": "Seated back twists."
+    },
+    {
+     "unitId": "u4",
+     "start": 480,
+     "end": 600,
+     "text": "Wrist and hand stretches."
+    }
+   ]
+  }
+ },
+ "scenarios": [
+  {
+   "id": "S1",
+   "exp": "PROPOSE·activity",
+   "msg": "我们去吃这家店吧",
+   "url": "https://maps.example.com/place/noodle-lab"
+  },
+  {
+   "id": "S2",
+   "exp": "PROPOSE·activity",
+   "note": "indirect",
+   "msg": "我想去看 Whalefall",
+   "url": "https://movies.example.com/whalefall"
+  },
+  {
+   "id": "S3",
+   "exp": "PROPOSE·activity",
+   "note": "indirect",
+   "msg": "我想吃这个菜",
+   "url": "https://tiktok.example.com/@homecook/video/tomato-egg-noodles"
+  },
+  {
+   "id": "S4",
+   "exp": "REQUEST·activity",
+   "sec": "DELIVER·opinion",
+   "msg": "我觉得这个文章说的对 所以你后面少吸烟吧",
+   "url": "https://health.example.com/articles/smoking-blood-vessels"
+  },
+  {
+   "id": "S5",
+   "exp": "REQUEST·opinion",
+   "msg": "这篇讲 hybrid 和 remote 的，你觉得我们组适合哪种？",
+   "url": "https://work.example.com/blog/hybrid-vs-remote"
+  },
+  {
+   "id": "S6",
+   "exp": "SUGGEST·activity",
+   "msg": "La Prima的matcha latte加vanilla syrup蛮好喝的",
+   "photo": "photo:la-prima-matcha"
+  },
+  {
+   "id": "S7",
+   "exp": "COMMIT·activity",
+   "msg": "这个书架我周六帮你装",
+   "url": "https://video.example.com/watch?v=bookcase-5shelf"
+  },
+  {
+   "id": "S8",
+   "exp": "REFUSE·activity",
+   "msg": "那家店我就不去了，这个帖子说周末要排两小时",
+   "url": "https://reddit.example.com/r/pittsburgh/comments/noodle_lab_wait"
+  },
+  {
+   "id": "S9",
+   "exp": "DELIVER·information",
+   "msg": "OPT在今年9.15有重大整改",
+   "url": "https://reddit.example.com/r/f1visa/comments/opt_changes_915"
+  },
+  {
+   "id": "S10",
+   "exp": "DELIVER·opinion",
+   "sec": "PROPOSE·activity",
+   "msg": "这个视频说的对，我们以后协作应该也采用这样的模式",
+   "url": "https://www.youtube.com/watch?v=S-sYlFiGFv8"
+  },
+  {
+   "id": "S11",
+   "exp": "REMIND·information",
+   "msg": "提醒一下，这个活动报名周五截止",
+   "url": "https://events.example.com/fall-hackathon"
+  },
+  {
+   "id": "S12",
+   "exp": "AMEND·information",
+   "msg": "刚才发错了，是这个新版本",
+   "url": "https://docs.example.com/offsite-agenda-v2"
+  },
+  {
+   "id": "S13",
+   "exp": "EXPRESS·reaction",
+   "msg": "lol",
+   "url": "https://video.example.com/watch?v=frisbee-fails&t=74"
+  },
+  {
+   "id": "S14",
+   "exp": "EXPRESS·attitude",
+   "msg": "谢谢你上次推荐这本书，真的改变了我对学习的看法",
+   "url": "https://books.example.com/make-it-stick"
+  },
+  {
+   "id": "S15",
+   "exp": "GREET",
+   "msg": "生日快乐！🎂 这首送你",
+   "url": "https://music.example.com/track/happy-birthday-jazz"
+  },
+  {
+   "id": "S16",
+   "exp": "DECLARE",
+   "msg": "这首就定为我们road trip的主题曲了",
+   "url": "https://music.example.com/track/open-highway"
+  },
+  {
+   "id": "S17",
+   "exp": "OTHER",
+   "msg": "",
+   "url": "https://video.example.com/watch?v=desk-stretch"
+  }
+ ],
+ "slots": [
+  {
+   "label": "Wed Oct 28 · 12:00",
+   "a": false,
+   "b": true
+  },
+  {
+   "label": "Wed Oct 28 · 19:00",
+   "a": true,
+   "b": false
+  },
+  {
+   "label": "Thu Oct 29 · 12:00",
+   "a": true,
+   "b": true
+  },
+  {
+   "label": "Fri Oct 30 · 18:30",
+   "a": true,
+   "b": true
+  },
+  {
+   "label": "Sat Oct 31 · 12:00",
+   "a": true,
+   "b": true
+  },
+  {
+   "label": "Sat Oct 31 · 15:30",
+   "a": false,
+   "b": true
+  },
+  {
+   "label": "Sun Nov 1 · 11:00",
+   "a": true,
+   "b": false
+  }
+ ]
+}
